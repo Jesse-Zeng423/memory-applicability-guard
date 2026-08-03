@@ -45,8 +45,14 @@ def verify() -> dict[str, object]:
             errors.append(f"hash mismatch: {relative}")
 
     manifest = json.loads((ROOT / "release/public_release_manifest_v1.0.0.json").read_text(encoding="utf-8"))
-    if manifest.get("status") != "GITHUB_READY_LOCAL_CANDIDATE":
+    if manifest.get("status") != "GITHUB_PUBLIC_RELEASE_AWAITING_HUMAN_REVIEW":
         errors.append("invalid publication status")
+    if manifest.get("github", {}).get("repository") != "Jesse-Zeng423/memory-applicability-guard":
+        errors.append("invalid GitHub repository")
+    if manifest.get("github", {}).get("visibility") != "PUBLIC":
+        errors.append("invalid GitHub visibility")
+    if manifest.get("human_review_status") != "PENDING":
+        errors.append("invalid human review status")
     if manifest.get("license_status") != "DUAL_LICENSE_CONFIGURED":
         errors.append("invalid license status")
     if manifest.get("licenses", {}).get("code_and_skill", {}).get("spdx_id") != "Apache-2.0":

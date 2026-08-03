@@ -4,16 +4,23 @@
   "package_name": "memory-applicability-guard",
   "package_version": "1.0.0",
   "created_at": "2026-08-03",
-  "status": "GITHUB_READY_LOCAL_CANDIDATE",
+  "status": "GITHUB_PUBLIC_RELEASE_AWAITING_HUMAN_REVIEW",
   "capability_positioning": "Research-informed decision-support prototype; not production validated",
   "research_disposition": "STOP_AT_V07",
-  "github_remote_configured": false,
-  "pushed": false,
-  "published": false,
+  "github_remote_configured": true,
+  "pushed": true,
+  "published": true,
+  "published_at": "2026-08-03",
+  "github": {
+    "repository": "Jesse-Zeng423/memory-applicability-guard",
+    "url": "https://github.com/Jesse-Zeng423/memory-applicability-guard",
+    "visibility": "PUBLIC",
+    "default_branch": "main"
+  },
   "publication_authorization": {
     "github_plugin_operation": "APPROVED_BY_REPOSITORY_OWNER",
     "license_selection": "APPROVED",
-    "remote_destination": "PENDING_CONFIGURATION"
+    "remote_destination": "APPROVED_PUBLIC_GITHUB_REPOSITORY"
   },
   "license_status": "DUAL_LICENSE_CONFIGURED",
   "licenses": {
@@ -57,8 +64,8 @@
     "external_api_required": false,
     "production_validation_claimed": false
   },
+  "human_review_status": "PENDING",
   "next_gates": [
-    "CONFIGURE_GITHUB_REMOTE_AND_VISIBILITY",
-    "PUSH_AND_VERIFY_REMOTE"
+    "HUMAN_REVIEW"
   ]
 }
