@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "manifest_type": "memory_applicability_guard_public_candidate",
+  "package_name": "memory-applicability-guard",
+  "package_version": "1.0.0",
+  "created_at": "2026-08-03",
+  "status": "GITHUB_READY_LOCAL_CANDIDATE_LICENSE_PENDING",
+  "capability_positioning": "Research-informed decision-support prototype; not production validated",
+  "research_disposition": "STOP_AT_V07",
+  "github_remote_configured": false,
+  "pushed": false,
+  "published": false,
+  "license_status": "NOT_SELECTED",
+  "skill_root": "memory-applicability-guard",
+  "skill_files": [
+    {"path": "SKILL.md", "sha256": "a2c73d346a4f0a4f061136ae94b2e20b1605e8dfa44084ee6ae993242c87b9b3"},
+    {"path": "agents/openai.yaml", "sha256": "1ce7346f3be5c42ccd173d0a92bebf991ff563bd63da74ff1a1b0f18ee0147c7"},
+    {"path": "references/decision-model.md", "sha256": "004d173e3042f2cbfaef863b525e390c6c260f3bbed9afe8e48d858afe8d94a3"},
+    {"path": "references/examples.md", "sha256": "f4156d58fff2cfcea06e1523672179b8ab4c87bffabf4243858570df120fdfdd"},
+    {"path": "references/research-boundaries.md", "sha256": "fa8f92509457af22ea104c1c52c5ffc455eb4936f246399c17494636428506e5"},
+    {"path": "scripts/guard_decision.py", "sha256": "7f4063589e88fe0a64e3eaaaebeb4b8b43fdf3f98e671e56e7bcaba08cbbb616"}
+  ],
+  "source_provenance": {
+    "approved_archive_sha256": "315b9e5a02f3651b3aa548819ffe67dc8ada9ddc38c2f710265ccf42428d2d80",
+    "approved_package_manifest_sha256": "4624930f890173757e4b4c1b0c5d509aed2633fedf5f5a7dee04c905be731536"
+  },
+  "validation": {
+    "standard_library_unit_tests": {"status": "PASS", "passed": 12},
+    "release_verifier": "PASS",
+    "skill_file_hashes": "PASS",
+    "frontend_exclusion": "PASS",
+    "private_data_exclusion": "PASS"
+  },
+  "attestations": {
+    "website_included": false,
+    "private_gold_included": false,
+    "frozen_model_outputs_included": false,
+    "credentials_included": false,
+    "host_specific_paths_included": false,
+    "external_api_required": false,
+    "production_validation_claimed": false
+  },
+  "next_gates": [
+    "PASS_FINAL_LOCAL_VERIFICATION",
+    "SELECT_LICENSE",
+    "APPROVE_GITHUB_REMOTE_AND_VISIBILITY",
+    "EXPLICIT_PUSH_AUTHORIZATION"
+  ]
+}

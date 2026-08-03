@@ -1,0 +1,4 @@
+interface:
+  display_name: "Memory Applicability Guard"
+  short_description: "Audit memory use with research-informed rules"
+  default_prompt: "Use $memory-applicability-guard to audit whether a candidate memory should inform the proposed action."
