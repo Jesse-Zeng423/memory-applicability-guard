@@ -67,9 +67,9 @@ Do not use it to autonomously approve medical, legal, financial, employment, ins
 
 The public repository is available at
 [`Jesse-Zeng423/memory-applicability-guard`](https://github.com/Jesse-Zeng423/memory-applicability-guard).
-The release remains a research-informed decision-support prototype and is
-awaiting independent human review; publication does not constitute production
-validation.
+The repository owner has confirmed completion of human review. The release
+remains a research-informed decision-support prototype; publication and review
+completion do not constitute production validation.
 
 ## License
 
