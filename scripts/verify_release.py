@@ -45,8 +45,14 @@ def verify() -> dict[str, object]:
             errors.append(f"hash mismatch: {relative}")
 
     manifest = json.loads((ROOT / "release/public_release_manifest_v1.0.0.json").read_text(encoding="utf-8"))
-    if manifest.get("status") != "GITHUB_READY_LOCAL_CANDIDATE_LICENSE_PENDING":
+    if manifest.get("status") != "GITHUB_READY_LOCAL_CANDIDATE":
         errors.append("invalid publication status")
+    if manifest.get("license_status") != "DUAL_LICENSE_CONFIGURED":
+        errors.append("invalid license status")
+    if manifest.get("licenses", {}).get("code_and_skill", {}).get("spdx_id") != "Apache-2.0":
+        errors.append("invalid code and Skill license")
+    if manifest.get("licenses", {}).get("documentation_and_public_data", {}).get("spdx_id") != "CC-BY-4.0":
+        errors.append("invalid documentation and public data license")
     expected_skill = sorted(item["path"] for item in manifest["skill_files"])
     actual_skill = sorted(str(path.relative_to(SKILL)) for path in SKILL.rglob("*") if path.is_file())
     if actual_skill != expected_skill:
@@ -69,6 +75,24 @@ def verify() -> dict[str, object]:
         errors.append("symlink found")
     if any(path.name == "__pycache__" or path.suffix == ".pyc" for path in ROOT.rglob("*")):
         errors.append("Python cache found")
+
+    apache = (ROOT / "LICENSES/Apache-2.0.txt").read_bytes()
+    if (ROOT / "LICENSE").read_bytes() != apache:
+        errors.append("root LICENSE does not match Apache-2.0.txt")
+    apache_text = apache.decode("ascii")
+    if "Apache License" not in apache_text or "Version 2.0, January 2004" not in apache_text:
+        errors.append("Apache-2.0 text markers missing")
+    cc_text = (ROOT / "LICENSES/CC-BY-4.0.txt").read_text(encoding="utf-8")
+    if "Attribution 4.0 International" not in cc_text or "Creative Commons Attribution 4.0 International Public License" not in cc_text:
+        errors.append("CC-BY-4.0 text markers missing")
+    scope = (ROOT / "LICENSE_SCOPE.md").read_text(encoding="utf-8")
+    if "Copyright 2026 Jesse Zeng" not in scope:
+        errors.append("license copyright holder missing")
+    if "complete\n  `memory-applicability-guard/` Skill package" not in scope:
+        errors.append("Skill package license scope missing")
+    notice = (ROOT / "NOTICE").read_text(encoding="utf-8")
+    if "STOP_AT_V07" not in notice or "not a production-validated autonomous safety system" not in notice:
+        errors.append("NOTICE research boundary missing")
 
     source = (SKILL / "scripts/guard_decision.py").read_text(encoding="utf-8")
     compile(source, str(SKILL / "scripts/guard_decision.py"), "exec")
@@ -108,7 +132,7 @@ def verify() -> dict[str, object]:
         "skill_files": len(actual_skill),
         "unit_tests": 12,
         "external_api_calls": 0,
-        "license_status": "NOT_SELECTED",
+        "license_status": "DUAL_LICENSE_CONFIGURED",
     }
 
 

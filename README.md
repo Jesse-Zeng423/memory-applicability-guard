@@ -34,6 +34,8 @@ scripts/verify_release.py     Offline repository verifier
 tests/test_guard_decision.py  Standard-library rule tests
 release/                      Public manifest and inventory
 SHA256SUMS                    Repository file checksums
+LICENSE_SCOPE.md              File-category license mapping
+LICENSES/                     Apache-2.0 and CC BY 4.0 full texts
 ```
 
 The Skill directory itself contains only `SKILL.md`, `agents/openai.yaml`, the deterministic helper, and three references. It contains no website, frontend, model output, private gold, credentials, or research dataset.
@@ -61,6 +63,24 @@ The frozen v0.7 experiment ended at `STOP_AT_V07`: A0 and M1 both scored 110/128
 
 Do not use it to autonomously approve medical, legal, financial, employment, insurance, housing, privacy, or safety-critical decisions. High-risk input is escalated for human review.
 
-## Publication and license status
+## Publication status
 
-This local repository is prepared for GitHub review but has not been pushed or published. A license has not yet been selected; see `LICENSE`. Public publication should remain blocked until the repository owner explicitly chooses the license and approves the remote destination and visibility.
+This local repository is prepared for GitHub publication but has not yet been pushed or published.
+
+## License
+
+This repository uses a dual-license model:
+
+- Code, scripts, schemas, validators, evaluators, tests, and the complete
+  `memory-applicability-guard/` Skill package are licensed under the Apache
+  License 2.0.
+- Research reports, repository documentation, diagrams, presentation
+  materials, synthetic examples outside the Skill package, and public
+  evaluation data are licensed under Creative Commons Attribution 4.0
+  International (CC BY 4.0).
+- Private gold labels, credentials, unpublished research artifacts, and
+  third-party materials are not included in these grants.
+
+See `LICENSE_SCOPE.md` for the controlling scope statement, `LICENSE` and
+`LICENSES/Apache-2.0.txt` for Apache-2.0, and
+`LICENSES/CC-BY-4.0.txt` for CC BY 4.0.
