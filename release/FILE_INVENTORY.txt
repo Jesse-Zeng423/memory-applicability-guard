@@ -27,4 +27,5 @@ schema/guard-input.schema.json
 schema/guard-output.schema.json
 scripts/verify_release.py
 tests/test_guard_decision.py
+tests/test_guard_edge_cases.py
 tests/test_input_schema.py
