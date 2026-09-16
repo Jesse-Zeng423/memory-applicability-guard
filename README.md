@@ -30,9 +30,11 @@ The Skill makes these distinctions explicit:
 
 ```text
 memory-applicability-guard/   Installable Skill package
+pyproject.toml                Optional Python package metadata and CLI entry point
+src/                          Thin installable wrapper around the Skill helper
 schema/                       JSON Schema and contract examples
 scripts/verify_release.py     Offline repository verifier
-tests/test_guard_decision.py  Standard-library rule tests
+tests/                        Standard-library rule, schema, and packaging tests
 release/                      Public manifest and inventory
 SHA256SUMS                    Repository file checksums
 LICENSE_SCOPE.md              File-category license mapping
@@ -58,6 +60,17 @@ python3 memory-applicability-guard/scripts/guard_decision.py --schema
 ```
 
 Invalid payloads still fail closed: the helper prints a JSON object on stderr with `error`, `details`, and an `issues` list, then exits `2`. `--schema` prints the closed input contract; `--validate-only` checks that contract without producing a decision. The same contract is checked in at `schema/guard-input.schema.json`, with worked examples in `schema/examples/`.
+
+## Install the Python helper
+
+The Skill directory remains a standalone Codex Skill. Optionally install the same helper as a Python package from a repository clone:
+
+```bash
+python3 -m pip install -e .
+python3 -m memory_applicability_guard --file schema/examples/superseded-pool.json --pretty
+```
+
+The installable package wraps the Skill helper; it does not copy or change the decision rules. This is a research-informed prototype. Installing it does not add a production safety guarantee.
 
 ## Install from GitHub after publication
 
