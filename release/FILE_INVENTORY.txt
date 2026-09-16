@@ -7,6 +7,7 @@ NOTICE
 README.md
 SECURITY.md
 SHA256SUMS
+docs/agent-workflow.md
 memory-applicability-guard/SKILL.md
 memory-applicability-guard/agents/openai.yaml
 memory-applicability-guard/references/decision-model.md
