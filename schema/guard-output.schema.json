@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jesse-Zeng423/memory-applicability-guard/schema/guard-output.schema.json",
+  "title": "Memory Applicability Guard output",
+  "description": "Closed recommendation object returned by the deterministic helper. Decision support only; not production validated.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "boundary",
+    "decisive_evidence",
+    "guard_verdict",
+    "memory_action",
+    "memory_state",
+    "next_step",
+    "reason_code",
+    "resolution_source"
+  ],
+  "properties": {
+    "boundary": {
+      "type": "string",
+      "const": "Research-informed decision-support prototype; not production validated; no autonomous execution or high-risk approval."
+    },
+    "decisive_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "text"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "kind": {
+            "type": "string",
+            "enum": ["MEMORY_SOURCE", "APPLICABILITY", "PERMISSION", "CURRENT_EXTERNAL", "USER_STATEMENT"]
+          },
+          "text": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "guard_verdict": {
+      "type": "string",
+      "enum": ["PASS", "REVISE", "ASK_USER", "VERIFY_EXTERNAL", "ESCALATE"]
+    },
+    "memory_action": {
+      "type": "string",
+      "enum": ["USE", "IGNORE", "ASK"]
+    },
+    "memory_state": {
+      "type": "string",
+      "enum": ["CLEAR_APPLICABLE", "CLEAR_INAPPLICABLE", "UNCERTAIN"]
+    },
+    "next_step": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason_code": {
+      "type": "string",
+      "enum": [
+        "PERMISSION_REVOKED",
+        "HIGH_RISK_HUMAN_REVIEW_REQUIRED",
+        "EXTERNAL_VERIFICATION_REQUIRED",
+        "NO_BRIDGE",
+        "SUPERSEDED",
+        "DIRECT",
+        "EXPLICIT_TRANSFER",
+        "USER_RESOLVABLE_UNCERTAINTY",
+        "ROBUST_ACTION_AVAILABLE",
+        "EVIDENCE_GAP"
+      ]
+    },
+    "resolution_source": {
+      "type": "string",
+      "enum": ["USER", "HUMAN_REVIEW", "EXTERNAL_EVIDENCE", "SUPPLIED_EVIDENCE", "NONE"]
+    }
+  }
+}

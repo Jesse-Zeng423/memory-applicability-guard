@@ -1,0 +1,14 @@
+{
+  "current_task": "Plan a team training session",
+  "candidate_memory": "The user prefers quiet training environments",
+  "proposed_memory_action": "USE",
+  "permission": "ALLOWED",
+  "relationship": "EXPLICIT_TRANSFER",
+  "evidence_status": "SUFFICIENT",
+  "robust_action_available": false,
+  "risk": "LOW",
+  "evidence": [
+    {"id": "SOURCE", "text": "Personal preference record", "kind": "MEMORY_SOURCE", "decisive": false},
+    {"id": "TRANSFER", "text": "The user said the same preference also applies to team training", "kind": "USER_STATEMENT", "decisive": true}
+  ]
+}

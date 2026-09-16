@@ -1,0 +1,14 @@
+{
+  "current_task": "Choose a training option",
+  "candidate_memory": "The user trained at the downtown pool",
+  "proposed_memory_action": "USE",
+  "permission": "ALLOWED",
+  "relationship": "UNKNOWN",
+  "evidence_status": "USER_RESOLVABLE",
+  "robust_action_available": false,
+  "risk": "LOW",
+  "evidence": [
+    {"id": "SOURCE", "text": "Old training record", "kind": "MEMORY_SOURCE", "decisive": false},
+    {"id": "QUESTION", "text": "Whether that pool is still the intended venue would change the action", "kind": "USER_STATEMENT", "decisive": true}
+  ]
+}

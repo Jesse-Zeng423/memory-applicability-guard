@@ -1,0 +1,14 @@
+{
+  "current_task": "Advise whether to wait for a remembered delayed train",
+  "candidate_memory": "The evening train was delayed last week",
+  "proposed_memory_action": "USE",
+  "permission": "ALLOWED",
+  "relationship": "UNKNOWN",
+  "evidence_status": "EXTERNAL_REQUIRED",
+  "robust_action_available": false,
+  "risk": "LOW",
+  "evidence": [
+    {"id": "SOURCE", "text": "Remembered delay from last week", "kind": "MEMORY_SOURCE", "decisive": false},
+    {"id": "LIVE", "text": "Current delay, price, or inventory status is not in the supplied evidence", "kind": "CURRENT_EXTERNAL", "decisive": true}
+  ]
+}

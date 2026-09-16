@@ -15,5 +15,16 @@ memory-applicability-guard/references/research-boundaries.md
 memory-applicability-guard/scripts/guard_decision.py
 release/FILE_INVENTORY.txt
 release/public_release_manifest_v1.0.0.json
+schema/examples/explicit-transfer.json
+schema/examples/external-required.json
+schema/examples/high-risk.json
+schema/examples/no-bridge.json
+schema/examples/permission-revoked.json
+schema/examples/robust-action.json
+schema/examples/superseded-pool.json
+schema/examples/user-resolvable.json
+schema/guard-input.schema.json
+schema/guard-output.schema.json
 scripts/verify_release.py
 tests/test_guard_decision.py
+tests/test_input_schema.py
