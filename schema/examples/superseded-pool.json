@@ -1,0 +1,14 @@
+{
+  "current_task": "Choose where to train this week",
+  "candidate_memory": "The user trained at the downtown pool",
+  "proposed_memory_action": "USE",
+  "permission": "ALLOWED",
+  "relationship": "SUPERSEDED",
+  "evidence_status": "SUFFICIENT",
+  "robust_action_available": false,
+  "risk": "LOW",
+  "evidence": [
+    {"id": "SOURCE", "text": "Old record: trained at the downtown pool", "kind": "MEMORY_SOURCE", "decisive": false},
+    {"id": "MOVE", "text": "The user has moved; the old pool is no longer convenient", "kind": "USER_STATEMENT", "decisive": true}
+  ]
+}

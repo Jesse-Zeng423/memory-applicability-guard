@@ -1,0 +1,14 @@
+{
+  "current_task": "Reuse a previously authorized contact method",
+  "candidate_memory": "The user authorized sharing this contact with the team",
+  "proposed_memory_action": "USE",
+  "permission": "REVOKED",
+  "relationship": "DIRECT",
+  "evidence_status": "SUFFICIENT",
+  "robust_action_available": false,
+  "risk": "LOW",
+  "evidence": [
+    {"id": "SOURCE", "text": "Older authorization record", "kind": "MEMORY_SOURCE", "decisive": false},
+    {"id": "REVOKE", "text": "Current permission evidence revokes the older authorization", "kind": "PERMISSION", "decisive": true}
+  ]
+}
