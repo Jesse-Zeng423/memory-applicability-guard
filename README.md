@@ -34,7 +34,9 @@ pyproject.toml                Optional Python package metadata and CLI entry poi
 src/                          Thin installable wrapper around the Skill helper
 schema/                       JSON Schema and contract examples
 docs/agent-workflow.md        Practical agent-pipeline usage guide
+benchmarks/                   Tiny synthetic scenario harness (not a production eval)
 scripts/verify_release.py     Offline repository verifier
+scripts/run_benchmark.py      Prints a markdown/JSON table of synthetic outcomes
 .github/workflows/verify.yml  Runs tests and the verifier across Python 3.9–3.13
 tests/                        Standard-library rule, schema, and packaging tests
 release/                      Public manifest and inventory
@@ -77,6 +79,16 @@ python3 -m memory_applicability_guard --file schema/examples/superseded-pool.jso
 The installable package wraps the Skill helper; it does not copy or change the decision rules. This is a research-informed prototype. Installing it does not add a production safety guarantee.
 
 For a step-by-step agent integration, including the exact JSON object, a before/after review loop, example prompts, and reason-code meanings, see `docs/agent-workflow.md`.
+
+## Synthetic benchmark harness
+
+To inspect deterministic outcomes for the checked-in examples without claiming a production evaluation:
+
+```bash
+python3 scripts/run_benchmark.py
+```
+
+The harness reprints `STOP_AT_V07` research framing and does not add accuracy or safety claims.
 
 ## Install from GitHub after publication
 

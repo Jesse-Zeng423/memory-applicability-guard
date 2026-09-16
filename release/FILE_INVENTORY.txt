@@ -8,6 +8,9 @@ NOTICE
 README.md
 SECURITY.md
 SHA256SUMS
+benchmarks/README.md
+benchmarks/scenarios/conflicting-permission.json
+benchmarks/scenarios/multi-evidence-no-decisive.json
 docs/agent-workflow.md
 memory-applicability-guard/SKILL.md
 memory-applicability-guard/agents/openai.yaml
@@ -28,10 +31,12 @@ schema/examples/superseded-pool.json
 schema/examples/user-resolvable.json
 schema/guard-input.schema.json
 schema/guard-output.schema.json
+scripts/run_benchmark.py
 scripts/update_release_inventory.py
 scripts/verify_release.py
 src/memory_applicability_guard/__init__.py
 src/memory_applicability_guard/__main__.py
+tests/test_benchmark_harness.py
 tests/test_guard_decision.py
 tests/test_guard_edge_cases.py
 tests/test_input_schema.py
