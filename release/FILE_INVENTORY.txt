@@ -1,3 +1,4 @@
+.github/workflows/verify.yml
 .gitignore
 LICENSE
 LICENSES/Apache-2.0.txt
@@ -27,6 +28,7 @@ schema/examples/superseded-pool.json
 schema/examples/user-resolvable.json
 schema/guard-input.schema.json
 schema/guard-output.schema.json
+scripts/update_release_inventory.py
 scripts/verify_release.py
 src/memory_applicability_guard/__init__.py
 src/memory_applicability_guard/__main__.py

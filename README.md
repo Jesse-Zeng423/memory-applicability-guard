@@ -35,6 +35,7 @@ src/                          Thin installable wrapper around the Skill helper
 schema/                       JSON Schema and contract examples
 docs/agent-workflow.md        Practical agent-pipeline usage guide
 scripts/verify_release.py     Offline repository verifier
+.github/workflows/verify.yml  Runs tests and the verifier across Python 3.9–3.13
 tests/                        Standard-library rule, schema, and packaging tests
 release/                      Public manifest and inventory
 SHA256SUMS                    Repository file checksums
@@ -50,6 +51,8 @@ The Skill directory itself contains only `SKILL.md`, `agents/openai.yaml`, the d
 python3 -m unittest discover -s tests -v
 python3 scripts/verify_release.py
 ```
+
+After adding or renaming files, refresh checksums with `python3 scripts/update_release_inventory.py`. The GitHub Actions workflow `.github/workflows/verify.yml` runs the same tests and verifier on Python 3.9 through 3.13.
 
 Both commands are offline and require only Python's standard library. The Skill helper accepts one JSON object on stdin, or from a file:
 

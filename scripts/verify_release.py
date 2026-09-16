@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -31,12 +32,36 @@ def tracked_files() -> list[str]:
     )
 
 
+def _count_mismatch(expected: list[str] | set[str], actual: list[str] | set[str], missing_label: str, extra_label: str) -> str:
+    missing = sorted(set(expected) - set(actual))
+    extra = sorted(set(actual) - set(expected))
+    parts = []
+    if missing:
+        parts.append(f"{missing_label}: {missing}")
+    if extra:
+        parts.append(f"{extra_label}: {extra}")
+    return "; ".join(parts) if parts else "lists differ only by order"
+
+
+def _unit_test_count(output: str) -> int | None:
+    for line in output.splitlines():
+        if line.startswith("Ran ") and " test" in line:
+            try:
+                return int(line.split()[1])
+            except ValueError:
+                return None
+    return None
+
+
 def verify() -> dict[str, object]:
     errors: list[str] = []
+    if sys.version_info < (3, 9):
+        errors.append(f"Python 3.9+ required; running {sys.version.split()[0]}")
+
     inventory = (ROOT / "release/FILE_INVENTORY.txt").read_text(encoding="utf-8").splitlines()
     actual = tracked_files()
     if inventory != actual:
-        errors.append("repository inventory mismatch")
+        errors.append("repository inventory mismatch; " + _count_mismatch(inventory, actual, "missing from tree", "extra in tree"))
 
     sums: dict[str, str] = {}
     for line in (ROOT / "SHA256SUMS").read_text(encoding="utf-8").splitlines():
@@ -44,7 +69,7 @@ def verify() -> dict[str, object]:
         sums[path] = value
     expected_sum_paths = set(actual) - {"SHA256SUMS"}
     if set(sums) != expected_sum_paths:
-        errors.append("SHA256SUMS coverage mismatch")
+        errors.append("SHA256SUMS coverage mismatch; " + _count_mismatch(expected_sum_paths, set(sums), "missing hashes", "unexpected hashes"))
     for relative, expected in sums.items():
         if digest(ROOT / relative) != expected:
             errors.append(f"hash mismatch: {relative}")
@@ -75,7 +100,7 @@ def verify() -> dict[str, object]:
         if path.is_file() and "__pycache__" not in path.parts
     )
     if actual_skill != expected_skill:
-        errors.append("skill inventory mismatch")
+        errors.append("skill inventory mismatch; " + _count_mismatch(expected_skill, actual_skill, "missing from skill", "extra in skill"))
     for item in manifest["skill_files"]:
         if digest(SKILL / item["path"]) != item["sha256"]:
             errors.append(f"skill hash mismatch: {item['path']}")
@@ -135,26 +160,33 @@ def verify() -> dict[str, object]:
     )
     for relative in actual:
         path = ROOT / relative
-        if path.suffix.lower() in {".md", ".py", ".yaml", ".json", ".txt", ""}:
+        if path.suffix.lower() in {".md", ".py", ".yaml", ".yml", ".toml", ".json", ".txt", ""}:
             text = path.read_text(encoding="utf-8")
             for pattern in privacy_patterns:
                 if pattern in text:
                     errors.append(f"privacy marker in {relative}: {pattern}")
 
+    test_env = os.environ.copy()
+    test_env["PYTHONDONTWRITEBYTECODE"] = "1"
     test = subprocess.run(
         [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"],
         cwd=ROOT,
         capture_output=True,
         text=True,
+        env=test_env,
     )
+    unit_tests = _unit_test_count(f"{test.stdout}\n{test.stderr}")
     if test.returncode:
-        errors.append("unit tests failed")
+        tail = [line for line in (test.stderr or test.stdout).splitlines() if line.strip()][-8:]
+        detail = " | ".join(tail) if tail else f"exit {test.returncode}"
+        errors.append(f"unit tests failed: {detail}")
     return {
         "status": "PASS" if not errors else "FAIL",
         "errors": errors,
         "files": len(actual),
         "skill_files": len(actual_skill),
-        "unit_tests": 12,
+        "unit_tests": unit_tests,
+        "python": sys.version.split()[0],
         "external_api_calls": 0,
         "license_status": "DUAL_LICENSE_CONFIGURED",
     }
