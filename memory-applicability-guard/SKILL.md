@@ -34,13 +34,16 @@ Apply this order:
 
 ## Run deterministic helper
 
-Pass one JSON object on stdin:
+Pass one JSON object on stdin, or use `--file`:
 
 ```bash
 python3 scripts/guard_decision.py < guard-input.json
+python3 scripts/guard_decision.py --file guard-input.json --pretty
+python3 scripts/guard_decision.py --validate-only --file guard-input.json
+python3 scripts/guard_decision.py --schema
 ```
 
-Use the helper only after extracting explicit structured inputs. Treat its JSON as a recommendation, not an automatic edit. If validation fails, correct the input; never weaken validation.
+Use the helper only after extracting explicit structured inputs. Treat its JSON as a recommendation, not an automatic edit. If validation fails, correct the input using the stderr `issues` list; never weaken validation.
 
 ## Respond
 
