@@ -4,6 +4,7 @@ import importlib.util
 import json
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -99,6 +100,52 @@ class GuardDecisionTests(unittest.TestCase):
         first = subprocess.run(command, input=encoded, capture_output=True, check=True).stdout
         second = subprocess.run(command, input=encoded, capture_output=True, check=True).stdout
         self.assertEqual(first, second)
+
+    def _run_cli(self, args, payload=None, check=False):
+        encoded = None if payload is None else json.dumps(payload, sort_keys=True)
+        return subprocess.run(
+            [sys.executable, str(SCRIPT), *args],
+            input=encoded,
+            capture_output=True,
+            text=True,
+            check=check,
+        )
+
+    def test_cli_file_and_pretty(self):
+        encoded = json.dumps(case(), sort_keys=True)
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            handle.write(encoded)
+            path = handle.name
+        self.addCleanup(lambda: Path(path).unlink(missing_ok=True))
+        compact = self._run_cli(["--file", path], check=True)
+        pretty = self._run_cli(["--file", path, "--pretty"], check=True)
+        self.assertEqual(json.loads(compact.stdout)["guard_verdict"], "PASS")
+        self.assertIn("\n", pretty.stdout)
+        self.assertEqual(json.loads(pretty.stdout)["memory_action"], "USE")
+
+    def test_cli_validate_only(self):
+        result = self._run_cli(["--validate-only"], case(), check=True)
+        self.assertEqual(json.loads(result.stdout), {"status": "VALID"})
+
+    def test_cli_schema_and_version(self):
+        schema = json.loads(self._run_cli(["--schema"], check=True).stdout)
+        self.assertEqual(schema["title"], "Memory Applicability Guard input")
+        self.assertEqual(set(schema["required"]), GUARD.REQUIRED_FIELDS)
+        version = self._run_cli(["--version"], check=True)
+        self.assertEqual(version.stdout.strip(), GUARD.__version__)
+
+    def test_cli_invalid_payload_lists_issues(self):
+        result = self._run_cli(["--pretty"], case(permission="INVALID"))
+        self.assertEqual(result.returncode, 2)
+        payload = json.loads(result.stderr)
+        self.assertEqual(payload["error"], "INPUT_VALIDATION_ERROR")
+        self.assertTrue(any("permission must be one of" in item for item in payload["issues"]))
+
+    def test_cli_missing_file(self):
+        result = self._run_cli(["--file", str(ROOT / "tests" / "missing.json")])
+        self.assertEqual(result.returncode, 2)
+        payload = json.loads(result.stderr)
+        self.assertIn("input file not found", payload["details"])
 
 
 if __name__ == "__main__":
