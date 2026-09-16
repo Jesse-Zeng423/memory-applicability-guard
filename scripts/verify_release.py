@@ -12,17 +12,22 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "memory-applicability-guard"
+IGNORE_DIR_NAMES = {".git", "__pycache__", ".venv", "dist", "build", ".pytest_cache", ".mypy_cache", ".eggs"}
 
 
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _ignored(path: Path) -> bool:
+    return any(part in IGNORE_DIR_NAMES or part.endswith(".egg-info") for part in path.parts)
+
+
 def tracked_files() -> list[str]:
     return sorted(
-        str(path.relative_to(ROOT))
+        path.relative_to(ROOT).as_posix()
         for path in ROOT.rglob("*")
-        if path.is_file() and ".git" not in path.parts and "__pycache__" not in path.parts
+        if path.is_file() and not _ignored(path)
     )
 
 
@@ -64,7 +69,11 @@ def verify() -> dict[str, object]:
     if manifest.get("licenses", {}).get("documentation_and_public_data", {}).get("spdx_id") != "CC-BY-4.0":
         errors.append("invalid documentation and public data license")
     expected_skill = sorted(item["path"] for item in manifest["skill_files"])
-    actual_skill = sorted(str(path.relative_to(SKILL)) for path in SKILL.rglob("*") if path.is_file())
+    actual_skill = sorted(
+        path.relative_to(SKILL).as_posix()
+        for path in SKILL.rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts
+    )
     if actual_skill != expected_skill:
         errors.append("skill inventory mismatch")
     for item in manifest["skill_files"]:
@@ -79,11 +88,16 @@ def verify() -> dict[str, object]:
         errors.append("frontmatter keys must be name and description only")
 
     forbidden_suffixes = {".html", ".css", ".js", ".jsx", ".tsx", ".png", ".jpg", ".jpeg"}
-    if any(path.suffix.lower() in forbidden_suffixes for path in ROOT.rglob("*") if path.is_file()):
+    repo_paths = [path for path in ROOT.rglob("*") if not _ignored(path)]
+    if any(path.is_file() and path.suffix.lower() in forbidden_suffixes for path in repo_paths):
         errors.append("website or screenshot asset found")
-    if any(path.is_symlink() for path in ROOT.rglob("*")):
+    if any(path.is_symlink() and not _ignored(path) for path in ROOT.rglob("*")):
         errors.append("symlink found")
-    if any(path.name == "__pycache__" or path.suffix == ".pyc" for path in ROOT.rglob("*")):
+    if any(
+        (path.name == "__pycache__" or path.suffix == ".pyc")
+        and not any(part in {".venv", "dist", "build", ".eggs"} or part.endswith(".egg-info") for part in path.parts)
+        for path in ROOT.rglob("*")
+    ):
         errors.append("Python cache found")
 
     apache = (ROOT / "LICENSES/Apache-2.0.txt").read_bytes()

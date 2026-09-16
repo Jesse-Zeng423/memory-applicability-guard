@@ -2,6 +2,8 @@
 
 Use only explicit structured inputs. The helper does not infer relationships from unrestricted prose.
 
+The closed input contract is also published as JSON Schema in `schema/guard-input.schema.json`, with worked examples in `schema/examples/`. The helper's `--schema` flag prints the same contract. Regenerating or editing classifications must keep the schema, this document, and `guard_decision.py` aligned.
+
 ## Closed input contract
 
 Required top-level fields:
