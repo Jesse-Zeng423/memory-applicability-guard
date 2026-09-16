@@ -1,0 +1,15 @@
+{
+  "current_task": "Choose a training option",
+  "candidate_memory": "The user trained at the downtown pool",
+  "proposed_memory_action": "USE",
+  "permission": "ALLOWED",
+  "relationship": "UNKNOWN",
+  "evidence_status": "USER_RESOLVABLE",
+  "robust_action_available": true,
+  "robust_action": "Choose the reversible option that works either way",
+  "risk": "LOW",
+  "evidence": [
+    {"id": "SOURCE", "text": "Old training record", "kind": "MEMORY_SOURCE", "decisive": false},
+    {"id": "ROBUST", "text": "A reversible option remains acceptable across the reasonable applicability worlds", "kind": "APPLICABILITY", "decisive": true}
+  ]
+}

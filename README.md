@@ -30,6 +30,7 @@ The Skill makes these distinctions explicit:
 
 ```text
 memory-applicability-guard/   Installable Skill package
+schema/                       JSON Schema and contract examples
 scripts/verify_release.py     Offline repository verifier
 tests/test_guard_decision.py  Standard-library rule tests
 release/                      Public manifest and inventory
@@ -56,7 +57,7 @@ python3 memory-applicability-guard/scripts/guard_decision.py --validate-only --f
 python3 memory-applicability-guard/scripts/guard_decision.py --schema
 ```
 
-Invalid payloads still fail closed: the helper prints a JSON object on stderr with `error`, `details`, and an `issues` list, then exits `2`. `--schema` prints the closed input contract; `--validate-only` checks that contract without producing a decision.
+Invalid payloads still fail closed: the helper prints a JSON object on stderr with `error`, `details`, and an `issues` list, then exits `2`. `--schema` prints the closed input contract; `--validate-only` checks that contract without producing a decision. The same contract is checked in at `schema/guard-input.schema.json`, with worked examples in `schema/examples/`.
 
 ## Install from GitHub after publication
 

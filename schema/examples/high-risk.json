@@ -1,0 +1,14 @@
+{
+  "current_task": "Recommend a medical, legal, or financial action from memory",
+  "candidate_memory": "The user previously followed a high-stakes plan",
+  "proposed_memory_action": "USE",
+  "permission": "ALLOWED",
+  "relationship": "DIRECT",
+  "evidence_status": "SUFFICIENT",
+  "robust_action_available": false,
+  "risk": "HIGH",
+  "evidence": [
+    {"id": "SOURCE", "text": "Prior high-stakes plan", "kind": "MEMORY_SOURCE", "decisive": false},
+    {"id": "RISK", "text": "The current task is high-risk and requires qualified human review", "kind": "APPLICABILITY", "decisive": true}
+  ]
+}

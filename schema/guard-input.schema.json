@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jesse-Zeng423/memory-applicability-guard/schema/guard-input.schema.json",
+  "title": "Memory Applicability Guard input",
+  "description": "Closed input contract for the deterministic helper. Classifications must be supplied explicitly; the helper does not infer them from prose. Decision support only; not production validated.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "candidate_memory",
+    "current_task",
+    "evidence",
+    "evidence_status",
+    "permission",
+    "proposed_memory_action",
+    "relationship",
+    "risk",
+    "robust_action_available"
+  ],
+  "properties": {
+    "current_task": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!\\s*$).+",
+      "description": "The current task the Agent is considering."
+    },
+    "candidate_memory": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!\\s*$).+",
+      "description": "The memory proposed to influence the task."
+    },
+    "proposed_memory_action": {
+      "type": "string",
+      "enum": [
+        "ASK",
+        "IGNORE",
+        "USE"
+      ],
+      "description": "The Agent's proposed memory reliance decision."
+    },
+    "permission": {
+      "type": "string",
+      "enum": [
+        "ALLOWED",
+        "REVOKED",
+        "UNKNOWN"
+      ],
+      "description": "Whether current permission allows relying on the memory."
+    },
+    "relationship": {
+      "type": "string",
+      "enum": [
+        "CONFLICTING",
+        "DIRECT",
+        "EXPLICIT_TRANSFER",
+        "NO_BRIDGE",
+        "SUPERSEDED",
+        "UNKNOWN"
+      ],
+      "description": "How the candidate memory relates to the current task."
+    },
+    "evidence_status": {
+      "type": "string",
+      "enum": [
+        "EXTERNAL_REQUIRED",
+        "SUFFICIENT",
+        "UNKNOWN",
+        "USER_RESOLVABLE"
+      ],
+      "description": "Whether supplied evidence is enough to decide applicability."
+    },
+    "robust_action_available": {
+      "type": "boolean",
+      "description": "True when one named action is acceptable across reasonable applicability worlds."
+    },
+    "robust_action": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "pattern": "^(?!\\s*$).+",
+      "description": "Required when robust_action_available is true; omit or null otherwise."
+    },
+    "risk": {
+      "type": "string",
+      "enum": [
+        "HIGH",
+        "LOW",
+        "MEDIUM"
+      ],
+      "description": "Risk of relying on the memory for the current task."
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Non-empty list of structured evidence objects with stable IDs.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "decisive",
+          "id",
+          "kind",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!\\s*$).+",
+            "description": "Stable evidence identifier."
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!\\s*$).+",
+            "description": "Evidence text as supplied; not inferred."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "APPLICABILITY",
+              "CURRENT_EXTERNAL",
+              "MEMORY_SOURCE",
+              "PERMISSION",
+              "USER_STATEMENT"
+            ],
+            "description": "Evidence category. MEMORY_SOURCE cannot be decisive."
+          },
+          "decisive": {
+            "type": "boolean",
+            "description": "True only for current boundary evidence that decides applicability."
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "MEMORY_SOURCE"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "properties": {
+                "decisive": {
+                  "const": false
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "robust_action_available": {
+            "const": true
+          }
+        },
+        "required": [
+          "robust_action_available"
+        ]
+      },
+      "then": {
+        "required": [
+          "robust_action"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "robust_action_available": {
+            "const": false
+          }
+        },
+        "required": [
+          "robust_action_available"
+        ]
+      },
+      "then": {
+        "properties": {
+          "robust_action": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}
