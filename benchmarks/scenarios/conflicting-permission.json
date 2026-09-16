@@ -1,0 +1,30 @@
+{
+  "current_task": "Reuse an older preference for a shared calendar invite",
+  "candidate_memory": "The user authorized sharing weekend plans with teammates",
+  "proposed_memory_action": "USE",
+  "permission": "UNKNOWN",
+  "relationship": "CONFLICTING",
+  "evidence_status": "SUFFICIENT",
+  "robust_action_available": false,
+  "risk": "MEDIUM",
+  "evidence": [
+    {
+      "id": "SOURCE",
+      "text": "Older note authorizing weekend-plan sharing",
+      "kind": "MEMORY_SOURCE",
+      "decisive": false
+    },
+    {
+      "id": "ALLOW",
+      "text": "User once said teammates may see weekend plans",
+      "kind": "PERMISSION",
+      "decisive": true
+    },
+    {
+      "id": "REVOKE",
+      "text": "Later message withdrew calendar sharing for personal weekends",
+      "kind": "PERMISSION",
+      "decisive": true
+    }
+  ]
+}

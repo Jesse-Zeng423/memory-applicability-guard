@@ -1,0 +1,30 @@
+{
+  "current_task": "Suggest a commute option for tomorrow",
+  "candidate_memory": "The user prefers the coastal train when working downtown",
+  "proposed_memory_action": "ASK",
+  "permission": "ALLOWED",
+  "relationship": "UNKNOWN",
+  "evidence_status": "USER_RESOLVABLE",
+  "robust_action_available": false,
+  "risk": "LOW",
+  "evidence": [
+    {
+      "id": "SOURCE",
+      "text": "Old preference for the coastal train",
+      "kind": "MEMORY_SOURCE",
+      "decisive": false
+    },
+    {
+      "id": "SIMILAR",
+      "text": "User also liked ferry rides last summer",
+      "kind": "APPLICABILITY",
+      "decisive": false
+    },
+    {
+      "id": "CONTEXT",
+      "text": "Tomorrow's meeting is downtown but start time is unsettled",
+      "kind": "USER_STATEMENT",
+      "decisive": false
+    }
+  ]
+}

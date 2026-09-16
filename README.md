@@ -30,8 +30,15 @@ The Skill makes these distinctions explicit:
 
 ```text
 memory-applicability-guard/   Installable Skill package
+pyproject.toml                Optional Python package metadata and CLI entry point
+src/                          Thin installable wrapper around the Skill helper
+schema/                       JSON Schema and contract examples
+docs/agent-workflow.md        Practical agent-pipeline usage guide
+benchmarks/                   Tiny synthetic scenario harness (not a production eval)
 scripts/verify_release.py     Offline repository verifier
-tests/test_guard_decision.py  Standard-library rule tests
+scripts/run_benchmark.py      Prints a markdown/JSON table of synthetic outcomes
+.github/workflows/verify.yml  Runs tests and the verifier across Python 3.9–3.13
+tests/                        Standard-library rule, schema, and packaging tests
 release/                      Public manifest and inventory
 SHA256SUMS                    Repository file checksums
 LICENSE_SCOPE.md              File-category license mapping
@@ -47,11 +54,41 @@ python3 -m unittest discover -s tests -v
 python3 scripts/verify_release.py
 ```
 
-Both commands are offline and require only Python's standard library. The Skill helper accepts one JSON object on stdin:
+After adding or renaming files, refresh checksums with `python3 scripts/update_release_inventory.py`. The GitHub Actions workflow `.github/workflows/verify.yml` runs the same tests and verifier on Python 3.9 through 3.13.
+
+Both commands are offline and require only Python's standard library. The Skill helper accepts one JSON object on stdin, or from a file:
 
 ```bash
 python3 memory-applicability-guard/scripts/guard_decision.py < guard-input.json
+python3 memory-applicability-guard/scripts/guard_decision.py --file guard-input.json --pretty
+python3 memory-applicability-guard/scripts/guard_decision.py --validate-only --file guard-input.json
+python3 memory-applicability-guard/scripts/guard_decision.py --schema
 ```
+
+Invalid payloads still fail closed: the helper prints a JSON object on stderr with `error`, `details`, and an `issues` list, then exits `2`. `--schema` prints the closed input contract; `--validate-only` checks that contract without producing a decision. The same contract is checked in at `schema/guard-input.schema.json`, with worked examples in `schema/examples/`.
+
+## Install the Python helper
+
+The Skill directory remains a standalone Codex Skill. Optionally install the same helper as a Python package from a repository clone:
+
+```bash
+python3 -m pip install -e .
+python3 -m memory_applicability_guard --file schema/examples/superseded-pool.json --pretty
+```
+
+The installable package wraps the Skill helper; it does not copy or change the decision rules. This is a research-informed prototype. Installing it does not add a production safety guarantee.
+
+For a step-by-step agent integration, including the exact JSON object, a before/after review loop, example prompts, and reason-code meanings, see `docs/agent-workflow.md`.
+
+## Synthetic benchmark harness
+
+To inspect deterministic outcomes for the checked-in examples without claiming a production evaluation:
+
+```bash
+python3 scripts/run_benchmark.py
+```
+
+The harness reprints `STOP_AT_V07` research framing and does not add accuracy or safety claims.
 
 ## Install from GitHub after publication
 
