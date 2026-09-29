@@ -1,7 +1,8 @@
 # Offline annotation review
 
-This workspace prepares independently reviewed targets for the
-[P2 protocol](../docs/p2-evaluation-plan.md). It does not run a model, create
+This workspace prepares independently reviewed targets for the accuracy stage of the
+[P2 protocol](../docs/p2-evaluation-plan.md). Human annotation is not a prerequisite
+for its earlier operational pilot and error analysis. It does not run a model, create
 ground truth automatically, or authenticate a reviewer's identity.
 
 The repository publishes the template and validator. Source packs, generated

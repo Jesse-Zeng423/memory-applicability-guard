@@ -36,6 +36,33 @@ outputs, or human-review records have been read or copied into model inputs.
 An execution runner must recheck the source fingerprint and the public-input
 allowlist before every request; a preparation check alone is insufficient.
 
+## Execution sequence and human workload
+
+Independent target labels are a prerequisite for accuracy claims, not for all
+model generation. Start with an operational pilot using eight public cases in
+both conditions. These sixteen first-pass requests are part of the existing
+256-call classification allowance, not additional calls. Freeze the balanced
+request plan before starting; retain incomplete and invalid results. Expand
+within the approved envelope only when the pilot and budget gate permit it.
+
+Without accepted targets, measure output completeness, structural validity,
+consistency failures, observed usage, and repair behavior. Differences in these
+rates do not establish better classification or safer decisions. No field or
+memory-action accuracy is reported at this stage.
+
+For later accuracy scoring, an assistant may prepare clearly marked annotation
+proposals from public scenes alone. A human reviewer must confirm the targets;
+model answers and helper agreement cannot independently establish their truth.
+The owner need not personally write every target from scratch. Keep reviewers
+blind to experimental answers and condition identities until target acceptance.
+A reviewed subset can support a separately scoped report, with its selection
+method and denominator disclosed; it cannot be represented as 128-case accuracy.
+
+Human annotation is optional if the deliverable is limited to software checks
+and operational error analysis. Full accuracy evaluation remains a separate
+milestone. All execution still requires fingerprint/leakage checks, approved
+settings, an enforceable budget, and new versioned output paths.
+
 ## Ground-truth gap
 
 The public pack contains scenes and boundary metadata, but no accepted targets
@@ -112,5 +139,9 @@ not a replacement for the frozen v0.7 result or production validation.
 - Prepared: 30 synthetic trigger prompts, separate proposed route labels, and
   128 unannotated evaluator-only target rows.
 - Offline preparation preflight: passed; it made zero model requests.
-- Pending: accepted targets, instrumented real host, enforceable spend ceiling,
-  generation calls, paired scoring, and final evaluation report.
+- Operational stage pending: frozen request plan, enforceable spend ceiling,
+  generation pilot, and an operational error report. Accepted targets are not
+  required for this stage.
+- Accuracy stage pending: independently accepted targets and paired scoring.
+- Host activation stage pending: instrumented real host and reviewed route labels.
+- No paid generation has occurred; the final evaluation report remains pending.
