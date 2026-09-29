@@ -60,7 +60,7 @@ These checks do not verify evidence truth, recency, or actual entailment.
 Medium-risk reliance requires decisive user or permission confirmation, and
 conflicting evidence receives a distinct reason code. The stricter rejection
 behavior changes the input acceptance contract; version 1.1.0 is adopted
-for this update; the owner has approved that version. Publication through the hardening PR does not imply a merged release. The existing verdict format remains intact:
+for this update. Publication through the hardening PR does not imply a merged release. The existing verdict format remains intact:
 ASK_USER still describes the next step even when proposed reliance is ASK.
 
 ## How it works
@@ -94,7 +94,9 @@ The output includes `guard_verdict`, `memory_action`, `memory_state`, `resolutio
 - `memory-applicability-guard/`: portable skill instructions, helper, and references.
 - `examples/`: runnable synthetic inputs, expected results, and a checked runner.
 - `tests/`: rule, validation, precedence, and command-line regression tests.
-- `scripts/`: offline integrity verification and manifest refresh tools.
+- `scripts/`: offline integrity verification, annotation validation, and manifest refresh tools.
+- `evaluation/`: offline review template and [annotation instructions](evaluation/README.md).
+- `local/` (ignored): local preparation, evaluator targets, and new versioned outputs; excluded from release metadata.
 - `docs/devto-build-log.md`: English build-log draft for editorial review.
 - `docs/hacktoberfest-2026.md`: flexible event plan and official sources.
 - `submissions/`: challenge mapping and a reusable entry worksheet.

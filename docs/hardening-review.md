@@ -9,9 +9,12 @@ from the supplied handoff. No historical research artifacts were modified.
 - Implemented: evidence-kind consistency checks, medium-risk confirmation,
   conflict reasoning, retained high-risk task review after revocation, and a
   classification rubric with concise skill routing.
-- Tested offline: 38 tests; all original 22 tests unchanged; three existing
+- Tested offline: 47 tests; all original 22 tests unchanged; three existing
   example CLI outputs byte-identical to the baseline; A–G exercised through
   the absolute-path CLI from an unrelated working directory.
+- Prepared offline: a blank 128-case annotation workspace with source checks,
+  draft import/export, review invalidation on edits, and evaluator validation.
+  Browser interaction checks passed; no reviewed targets were created.
 - Verified in a real agent host: not yet established. No activation, extraction
   accuracy, or end-to-end improvement is claimed by these software checks.
 - Still incomplete: P2 model evaluation and accepted field-level evaluation

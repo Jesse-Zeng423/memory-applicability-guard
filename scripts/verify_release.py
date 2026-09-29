@@ -18,7 +18,8 @@ def digest(path):
 
 def package_files():
     return sorted(str(p.relative_to(ROOT)) for p in ROOT.rglob("*")
-                  if p.is_file() and not (set(p.relative_to(ROOT).parts) & IGNORED_PARTS)
+                  if p.is_file() and p.relative_to(ROOT).parts[0] != "local"
+                  and not (set(p.relative_to(ROOT).parts) & IGNORED_PARTS)
                   and p.name not in {".DS_Store", ".coverage"} and p.suffix != ".pyc")
 
 def verify():

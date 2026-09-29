@@ -19,7 +19,9 @@ was checked separately. Access does not establish evaluation success.
 Credentials enter only the evaluation child process through environment
 variables. They are excluded from repository files, requests saved to disk,
 reports, and diagnostics. Keychain is not used. The local launcher and
-preparation artifacts live in private Git metadata and are not published.
+preparation artifacts live under ignored `local/p2-v1.1.0/` and are not published.
+The public offline [review workspace](../evaluation/README.md) creates blank
+annotation pages from an explicitly supplied, fingerprinted public pack.
 
 ## Public sample provenance
 
