@@ -96,6 +96,7 @@ The output includes `guard_verdict`, `memory_action`, `memory_state`, `resolutio
 - `tests/`: rule, validation, precedence, and command-line regression tests.
 - `scripts/`: offline integrity verification, annotation validation, and manifest refresh tools.
 - `evaluation/`: offline review template and [annotation instructions](evaluation/README.md).
+- `docs/p2-operational-pilot.md`: eight-case operational results and the remaining human-review milestone.
 - `local/` (ignored): local preparation, evaluator targets, and new versioned outputs; excluded from release metadata.
 - `docs/devto-build-log.md`: English build-log draft for editorial review.
 - `docs/hacktoberfest-2026.md`: flexible event plan and official sources.

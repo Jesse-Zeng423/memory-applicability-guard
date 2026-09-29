@@ -170,8 +170,10 @@ def validate_bundle(bundle: dict, rows: list[dict], source_hash: str, require_re
             "boundary": "Human review is recorded, not independently authenticated by this tool."}
 
 
-def build_html(rows: list[dict], source_hash: str) -> str:
-    data = {"source_sha256": source_hash, "rows": rows, "bundle": blank_bundle(rows, source_hash),
+def build_html(rows: list[dict], source_hash: str, draft: dict | None = None) -> str:
+    if draft is not None and validate_bundle(draft, rows, source_hash)["status"] != "PASS":
+        raise ValueError("Initial annotation draft does not match the public source")
+    data = {"source_sha256": source_hash, "rows": rows, "bundle": draft if draft is not None else blank_bundle(rows, source_hash),
             "enums": ENUMS, "evidence": [evidence_records(row) for row in rows]}
     encoded = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     template = (ROOT / "evaluation/review.html").read_text()
@@ -185,6 +187,7 @@ def main() -> int:
     parser.add_argument("--source-sha256", required=True)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--targets", type=Path)
+    parser.add_argument("--draft", type=Path, help="Optional matching draft to embed in a new review page")
     parser.add_argument("--require-reviewed", action="store_true")
     args = parser.parse_args()
     try:
@@ -195,7 +198,8 @@ def main() -> int:
             if args.output.exists():
                 raise ValueError("Output already exists; use a new versioned filename")
             args.output.parent.mkdir(parents=True, exist_ok=True)
-            args.output.write_text(build_html(rows, source_hash), encoding="utf-8")
+            draft = json.loads(args.draft.read_text()) if args.draft else None
+            args.output.write_text(build_html(rows, source_hash, draft), encoding="utf-8")
             print(json.dumps({"status": "PASS", "cases": len(rows), "human_review": "PENDING", "model_calls": 0}))
             return 0
         if args.targets is None:

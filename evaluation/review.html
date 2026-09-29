@@ -282,6 +282,12 @@
       ><input id="file" type="file" accept=".json,application/json" hidden />
     </div>
     <div id="message" class="message" role="status"></div>
+    <div
+      id="proposal-notice"
+      class="notice"
+      hidden
+      style="margin: 16px 4vw 0"
+    ></div>
     <main class="layout">
       <section>
         <div id="case-id" class="case-id"></div>
@@ -662,6 +668,14 @@
         }
       };
       render();
+      const proposedCount = bundle.cases.filter((c) =>
+        c.notes.startsWith("ASSISTANT PROPOSAL, NOT GOLD."),
+      ).length;
+      if (proposedCount) {
+        $("proposal-notice").hidden = false;
+        $("proposal-notice").textContent =
+          `${proposedCount} assistant proposals are provided for review. They are drafts, not accepted targets. Review the first ${proposedCount} cases; the remaining cases can wait. Experimental answers are not shown.`;
+      }
     </script>
   </body>
 </html>

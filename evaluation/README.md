@@ -60,3 +60,47 @@ The page's reviewed mark is provisional. Final acceptance is a separate human
 step, and helper agreement alone cannot establish ground truth. Keep all
 targets and notes out of model requests. Do not claim accuracy while targets
 remain unaccepted; see the P2 protocol for the remaining budget and host gates.
+
+## Operational preparation without human labels
+
+`scripts/p2_operational.py` builds a deterministic paired request plan from the
+same fingerprinted public source. The order alternates contract-first and
+rubric-first; model, reasoning, JSON format, proposed reliance, output allowance,
+and public scene are held constant. The only treatment change is the rubric.
+The file can be executed to create a new versioned plan directory:
+
+```bash
+python3 -B scripts/p2_operational.py \
+  --public-pack local/p2-v1.1.0/inputs/public-pack.jsonl \
+  --source-sha256 e4c1ff0319f71925461ff6c5d6c66da73c1c5da5160d6b86449a0ffa95109d39 \
+  --output local/p2-v1.1.0/plans/classification-v1
+```
+
+Existing plan directories are never overwritten. The module also validates
+provider output against the helper and checks that task text, candidate text,
+evidence IDs, and serialized source records are preserved. It does not contact
+an API, load credentials, read evaluator targets, or simulate real-host routing.
+An owner-specific transport remains local and is not part of the installed skill.
+
+The accounting component reserves maximum output usage before each generation,
+including reasoning tokens. It settles against total provider output usage,
+retains unresolved reservations, rejects changed settings, and enforces both
+call and spending limits. Provider input counting and an exclusive persistent
+journal must be supplied by the transport; the in-memory component alone is
+not a complete budget enforcement system.
+
+The September 29, 2026 snapshot uses conservative input accounting at USD 2.50
+per million tokens (including cache-write headroom) and output at USD 12 per
+million, with no cache discounts. See [official pricing](https://developers.openai.com/api/docs/pricing)
+and [reasoning output limits](https://developers.openai.com/api/docs/guides/reasoning).
+Reverify rates and currency headroom before a new live run. Incomplete output
+can still consume input and reasoning tokens and remains in the denominator.
+
+## Reviewing proposals
+
+A new page can optionally embed a matching evaluator draft with `--draft`.
+Validation rejects source or record mismatches before embedding. Assistant
+proposals must be explicitly labeled `ASSISTANT PROPOSAL, NOT GOLD.` in notes
+and remain DRAFT; the page displays their provisional status. Preparing a
+proposal does not record a human review. Keep experimental answers and condition
+identities hidden from the reviewer until targets are accepted.

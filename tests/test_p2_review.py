@@ -123,6 +123,16 @@ class ReviewTests(unittest.TestCase):
         self.assertIn("connect-src 'none'", html)
         self.assertNotIn("__REVIEW_DATA__", html)
 
+    def test_embedded_proposals_remain_drafts_and_require_matching_source(self):
+        self.bundle["cases"][0]["targets"]["risk"] = "LOW"
+        self.bundle["cases"][0]["notes"] = "ASSISTANT PROPOSAL, NOT GOLD."
+        html = REVIEW.build_html(self.rows, self.fingerprint, self.bundle)
+        self.assertIn("ASSISTANT PROPOSAL, NOT GOLD.", html)
+        self.assertEqual(self.result()["reviewed"], 0)
+        self.bundle["source_sha256"] = "wrong"
+        with self.assertRaises(ValueError):
+            REVIEW.build_html(self.rows, self.fingerprint, self.bundle)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,7 @@
-# P2 evaluation protocol: preparation only
+# P2 evaluation protocol: operational pilot and later accuracy review
 
-Protocol version: `skill-p2-v1.1.0`. No model-generation results are reported.
+Protocol version: `skill-p2-v1.1.0`. The [eight-case operational pilot](p2-operational-pilot.md)
+has completed; classification accuracy remains unmeasured.
 This evaluation is distinct from the frozen v0.7 research experiment and
 cannot reinterpret or overwrite its STOP_AT_V07 conclusion.
 
@@ -131,17 +132,20 @@ actual usage, uncertainty, and limitations. Report no accuracy improvement until
 supported by that report. A P2 result would be new evidence under this protocol,
 not a replacement for the frozen v0.7 result or production validation.
 
-## Current preparation status
+## Current status
 
-- Credential access check: authenticated access to the requested model succeeded.
-- Local credential launcher: child-process environment check passed; no key stored.
-- Public source: hash and 128-row count confirmed.
-- Prepared: 30 synthetic trigger prompts, separate proposed route labels, and
-  128 unannotated evaluator-only target rows.
-- Offline preparation preflight: passed; it made zero model requests.
-- Operational stage pending: frozen request plan, enforceable spend ceiling,
-  generation pilot, and an operational error report. Accepted targets are not
-  required for this stage.
-- Accuracy stage pending: independently accepted targets and paired scoring.
-- Host activation stage pending: instrumented real host and reviewed route labels.
-- No paid generation has occurred; the final evaluation report remains pending.
+- Credential access and public source checks passed; no credential is recorded.
+- The frozen v2 plan contains 128 paired public cases. Its first eight cases
+  completed in sixteen generation calls; all passed source/helper validation.
+- The [pilot report](p2-operational-pilot.md) records usage, conservative cost,
+  condition disagreements, fingerprints, and limitations. No accuracy is claimed.
+- Eight assistant target proposals remain DRAFT; they were prepared before
+  experimental answer inspection and are not used as ground truth.
+- Next human step: review those first eight proposals in the offline page,
+  correct classifications and evidence, and export a versioned draft. The
+  remaining 120 cases can wait. No further paid calls are automatically resumed.
+- Later accuracy scoring requires independently accepted targets; full 128-case
+  accuracy additionally requires the remaining pairs and target coverage.
+- Real-host activation and reviewed route labels remain a separate pending stage.
+- Future execution must carry forward the sixteen completed generation calls,
+  prior costs, and all frozen fingerprints; completed calls must not be repeated.

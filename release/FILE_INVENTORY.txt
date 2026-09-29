@@ -12,6 +12,7 @@ docs/devto-build-log.md
 docs/hacktoberfest-2026.md
 docs/hardening-review.md
 docs/p2-evaluation-plan.md
+docs/p2-operational-pilot.md
 evaluation/README.md
 evaluation/review.html
 examples/README.md
@@ -35,6 +36,7 @@ memory-applicability-guard/scripts/guard_decision.py
 release/FILE_INVENTORY.txt
 release/package_manifest.json
 release/public_release_manifest_v1.0.0.json
+scripts/p2_operational.py
 scripts/p2_review.py
 scripts/refresh_release.py
 scripts/verify_release.py
@@ -42,5 +44,6 @@ submissions/challenge-map.md
 submissions/entry-template.md
 tests/test_guard_decision.py
 tests/test_guard_hardening.py
+tests/test_p2_operational.py
 tests/test_p2_review.py
 tests/test_skill_contract.py
