@@ -39,7 +39,7 @@ def _nonempty_string(value: Any) -> bool:
 
 def _validate_enum(payload: dict[str, Any], field: str, allowed: set[str], errors: list[str]) -> None:
     value = payload.get(field)
-    if value not in allowed:
+    if not isinstance(value, str) or value not in allowed:
         errors.append(f"{field} must be one of {sorted(allowed)}; got {value!r}")
 
 
@@ -94,7 +94,7 @@ def validate_input(payload: Any) -> dict[str, Any]:
                 seen.add(evidence_id)
             if not _nonempty_string(item.get("text")):
                 errors.append(f"{prefix}.text must be a non-empty string")
-            if item.get("kind") not in EVIDENCE_KINDS:
+            if not isinstance(item.get("kind"), str) or item.get("kind") not in EVIDENCE_KINDS:
                 errors.append(f"{prefix}.kind must be one of {sorted(EVIDENCE_KINDS)}")
             if not isinstance(item.get("decisive"), bool):
                 errors.append(f"{prefix}.decisive must be a boolean")
