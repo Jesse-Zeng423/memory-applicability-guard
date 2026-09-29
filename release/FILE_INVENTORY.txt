@@ -15,6 +15,7 @@ docs/p2-evaluation-plan.md
 docs/p2-operational-pilot.md
 evaluation/README.md
 evaluation/review.html
+evaluation/review.js
 examples/README.md
 examples/explicit-transfer.expected.json
 examples/explicit-transfer.input.json

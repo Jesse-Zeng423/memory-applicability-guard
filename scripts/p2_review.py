@@ -177,7 +177,8 @@ def build_html(rows: list[dict], source_hash: str, draft: dict | None = None) ->
             "enums": ENUMS, "evidence": [evidence_records(row) for row in rows]}
     encoded = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     template = (ROOT / "evaluation/review.html").read_text()
-    return template.replace("__REVIEW_DATA__", encoded)
+    logic = (ROOT / "evaluation/review.js").read_text()
+    return template.replace("__REVIEW_LOGIC__", logic).replace("__REVIEW_DATA__", encoded)
 
 
 def main() -> int:

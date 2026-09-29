@@ -4,6 +4,8 @@ import copy
 import hashlib
 import importlib.util
 import json
+import shutil
+import subprocess
 from pathlib import Path
 import tempfile
 import unittest
@@ -122,6 +124,7 @@ class ReviewTests(unittest.TestCase):
         self.assertIn("\\u003c/script", html)
         self.assertIn("connect-src 'none'", html)
         self.assertNotIn("__REVIEW_DATA__", html)
+        self.assertNotIn("__REVIEW_LOGIC__", html)
 
     def test_embedded_proposals_remain_drafts_and_require_matching_source(self):
         self.bundle["cases"][0]["targets"]["risk"] = "LOW"
@@ -132,6 +135,50 @@ class ReviewTests(unittest.TestCase):
         self.bundle["source_sha256"] = "wrong"
         with self.assertRaises(ValueError):
             REVIEW.build_html(self.rows, self.fingerprint, self.bundle)
+
+    @unittest.skipUnless(shutil.which("node"), "Node is needed for browser contract checks")
+    def test_browser_draft_roundtrip_and_review_invalidation(self):
+        data = {"rows": self.rows, "bundle": self.bundle,
+                "source_sha256": self.fingerprint,
+                "evidence": [REVIEW.evidence_records(row) for row in self.rows]}
+        script = r"""
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const ui = require(process.argv[1]);
+const data = JSON.parse(fs.readFileSync(0, 'utf8'));
+const original = JSON.stringify(data.bundle);
+const restored = ui.validateDraft(JSON.parse(original), data);
+assert.equal(JSON.stringify(restored), original);
+assert.equal(restored.cases[0].targets.memory_action, null);
+assert.equal(ui.optionText('risk','HIGH','zh').includes('HIGH'), false);
+assert.notEqual(ui.optionText('risk','HIGH','zh'), ui.optionText('risk','HIGH','en'));
+const wrong = JSON.parse(original); wrong.source_sha256='wrong';
+assert.throws(()=>ui.validateDraft(wrong,data), /source/);
+assert.equal(JSON.stringify(data.bundle), original);
+const foreign = JSON.parse(original); foreign.cases[0].evidence_kinds.missing='USER_STATEMENT';
+assert.throws(()=>ui.validateDraft(foreign,data), /evidence/);
+const c=restored.cases[0];
+assert(ui.reviewIssues(c).some(x=>x.key==='memory_action' && x.step===7));
+c.targets = {...c.targets, permission:'UNKNOWN', relationship:'UNKNOWN', evidence_status:'UNKNOWN', risk:'LOW', robust_action_available:false, memory_action:'ASK', decisive_evidence_ids:[]};
+c.evidence_kinds={m1:'MEMORY_SOURCE'};
+assert.equal(ui.reviewIssues(c).length,0);
+c.review={status:'REVIEWED', reviewer:'Synthetic reviewer', reviewed_at:'2026-09-29T12:00:00Z'};
+assert.equal(ui.validateDraft(restored,data).cases[0].review.status,'REVIEWED');
+c.targets.decisive_evidence_ids=['m1'];
+assert.throws(()=>ui.validateDraft(restored,data), /evidence/);
+c.targets.decisive_evidence_ids=[];
+c.targets.relationship='DIRECT';
+assert(ui.reviewIssues(c).some(x=>x.code==='needSupport'));
+c.targets.robust_action_available=true;c.targets.robust_action='A concrete alternative';
+ui.setAnswer(c,'robust_action_available',false);
+assert.equal(c.targets.robust_action,null);
+assert.deepEqual(c.review,{status:'DRAFT',reviewer:null,reviewed_at:null});
+assert.equal(c.targets.memory_action,'ASK');
+"""
+        result = subprocess.run([shutil.which("node"), "-e", script,
+                                 str(ROOT / "evaluation/review.js")],
+                                input=json.dumps(data), text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 if __name__ == "__main__":

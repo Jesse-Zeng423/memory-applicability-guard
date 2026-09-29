@@ -32,15 +32,27 @@ not prefilled targets under this protocol. Original source text is preserved.
 
 ## Review and preserve work
 
-1. Classify permission, relationship, evidence status, action risk, and robust
-   options independently of model outputs. Choose expected memory reliance.
-2. Assign evidence roles to supplied IDs and select decisive support. Record
-   ambiguity and acceptable alternatives in review notes before scoring.
-3. Enter a reviewer name and mark the case reviewed. Changing a classification,
-   evidence role, decisive ID, or note resets that case to draft.
-4. Export a JSON draft before closing the tab. Import restores a matching draft;
-   source, protocol, case, and evidence mismatches are rejected.
-5. Validate the exported file. Use new versioned filenames for revisions.
+The page defaults to Chinese and offers an English switch. Raw enum codes are
+hidden until requested. Source text and exported values remain unchanged.
+
+1. Read the current task and the prominently displayed candidate memory. These
+   remain visible beside each question. Inspect the dated user records.
+2. Follow eight steps: read, permission, applicability, missing evidence, action
+   consequences, alternatives, supporting records, and your final decision.
+   Each answer uses a plain-language label and an explanation.
+3. Choose evidence roles beside the actual record text. Mark a record decisive
+   only if removing it would change your judgment. Original memory provenance
+   alone cannot be decisive support.
+4. Choose **use, ignore, or ask** yourself. The page displays your chosen decision
+   and supporting classifications as a draft; it never selects an answer for you.
+5. Add notes and a reviewer name, then confirm the review. Missing answers or
+   support return you to the relevant step. Editing an answer, evidence, or notes
+   resets the case to draft. The review mark remains provisional.
+6. Export a JSON draft before closing or refreshing. There is no autosave.
+   To move from an older page, export there first and import the file here.
+   Matching older drafts retain their answers, notes, and review records; imports
+   with source, protocol, case, or evidence mismatches leave the current work intact.
+7. Validate the export separately. Use new versioned filenames for revisions.
 
 ```bash
 python3 -B scripts/p2_review.py validate \

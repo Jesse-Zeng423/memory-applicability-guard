@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -7,13 +7,20 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; base-uri 'none'; form-action 'none'"
     />
-    <title>Memory applicability · annotation review</title>
+    <title>记忆审核 · 一步一步判断</title>
     <style>
       :root {
-        font-family: Charter, "Bitstream Charter", Georgia, serif;
-        color: #172a35;
-        background: #f4f7fa;
-        line-height: 1.55;
+        font-family:
+          "PingFang SC", "Microsoft YaHei", "Avenir Next", sans-serif;
+        color: #18343c;
+        background: #edf3f3;
+        line-height: 1.65;
+        --ink: #18343c;
+        --muted: #567078;
+        --line: #cbdcde;
+        --accent: #086b75;
+        --paper: #fff;
+        --gold: #9a6614;
       }
       * {
         box-sizing: border-box;
@@ -26,656 +33,527 @@
       select,
       textarea {
         font: inherit;
+        color: inherit;
       }
       button {
         cursor: pointer;
-        border: 1px solid #98a9b5;
-        border-radius: 3px;
         background: white;
-        padding: 8px 14px;
-        color: inherit;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 9px 15px;
       }
       button:hover {
-        background: #eaf0f4;
+        background: #e7f2f2;
       }
       button:disabled {
-        opacity: 0.45;
+        opacity: 0.4;
         cursor: default;
       }
       button.primary {
-        background: #184d70;
-        color: white;
-        border-color: #184d70;
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
       }
-      a {
-        color: #184d70;
+      button.text {
+        border: 0;
+        background: transparent;
+        padding: 6px;
       }
-      :focus-visible {
-        outline: 3px solid #efb843;
+      button:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible,
+      select:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid #ca921e;
         outline-offset: 3px;
       }
-      header {
-        background: #172a35;
-        color: #fff;
-        padding: 22px 4vw;
+      [hidden] {
+        display: none !important;
       }
-      header h1 {
-        font-size: 25px;
-        margin: 0 0 4px;
-        font-weight: 500;
-      }
-      header p {
-        margin: 0;
-        color: #c3d1dc;
-        font-size: 15px;
-      }
-      .bar {
+      .top {
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+        padding: 18px max(24px, calc((100vw - 1320px) / 2));
         display: flex;
-        gap: 12px;
+        gap: 18px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .brand {
+        flex: 1;
+        min-width: 190px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 650;
+        letter-spacing: 0.02em;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 2px 0 0;
+      }
+      .tools {
+        display: flex;
+        gap: 8px;
         flex-wrap: wrap;
         align-items: center;
-        padding: 16px 4vw;
-        border-bottom: 1px solid #cfdae1;
-        background: white;
-        font-family: "Avenir Next", Avenir, sans-serif;
-        font-size: 14px;
       }
-      .bar .count {
+      .tools button {
+        font-size: 13px;
+      }
+      .casebar {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 16px 24px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .casebar strong {
+        font-size: 17px;
         margin-right: auto;
       }
-      .bar input {
-        width: 170px;
-        border: 1px solid #a2b2be;
-        padding: 6px;
+      .chip {
+        font-size: 12px;
+        color: #086b75;
+        background: #deeeee;
+        border-radius: 4px;
+        padding: 3px 8px;
       }
-      .layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1.05fr) minmax(340px, 1fr);
-        gap: 32px;
-        max-width: 1440px;
-        margin: auto;
-        padding: 30px 4vw;
-      }
-      .case-id {
-        font:
-          12px "Avenir Next",
-          sans-serif;
-        overflow-wrap: anywhere;
-        color: #607887;
-      }
-      h2 {
-        font-size: 24px;
-        font-weight: 500;
-        margin: 4px 0 20px;
-      }
-      h3 {
-        font-size: 17px;
-        margin: 24px 0 8px;
-      }
-      p {
-        max-width: 72ch;
-      }
-      .context {
-        white-space: pre-wrap;
-      }
-      .notice {
-        padding: 12px 16px;
-        border-left: 3px solid #c6902e;
-        background: #fff7e5;
-        font:
-          14px/1.5 "Avenir Next",
-          sans-serif;
-      }
-      .record {
-        border-top: 1px solid #c7d3dc;
-        padding: 14px 0;
-      }
-      .record summary {
-        cursor: pointer;
-        font:
-          14px "Avenir Next",
-          sans-serif;
-      }
-      .record pre {
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-        font:
-          13px/1.65 ui-monospace,
-          Menlo,
-          monospace;
-        color: #344c5a;
-      }
-      .form {
-        background: white;
-        border: 1px solid #d2dce3;
-        padding: 24px;
-      }
-      .fields {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-      .field label {
-        display: block;
-        font:
-          14px "Avenir Next",
-          sans-serif;
-        margin-bottom: 5px;
-      }
-      .field select,
-      .field textarea {
-        width: 100%;
-        background: white;
-        border: 1px solid #94a8b6;
-        padding: 8px;
-      }
-      .wide {
-        grid-column: 1/-1;
-      }
-      .help {
-        font:
-          13px/1.5 "Avenir Next",
-          sans-serif;
-        color: #586f7f;
-        margin: 8px 0 16px;
-      }
-      .evidence-row {
-        display: grid;
-        grid-template-columns: 1fr minmax(145px, 0.7fr) 65px;
-        gap: 9px;
-        padding: 10px 0;
-        border-top: 1px solid #dae2e8;
-        align-items: center;
-      }
-      .evidence-row .id {
-        font:
-          11px/1.4 ui-monospace,
-          Menlo,
-          monospace;
-        overflow-wrap: anywhere;
-      }
-      .evidence-row select {
-        width: 100%;
-        padding: 6px;
-        font:
-          12px "Avenir Next",
-          sans-serif;
-      }
-      .evidence-row label {
-        font:
-          12px "Avenir Next",
-          sans-serif;
-      }
-      textarea {
-        resize: vertical;
-        min-height: 75px;
-      }
-      .foot {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: 20px;
-        font:
-          13px "Avenir Next",
-          sans-serif;
-      }
-      .status {
-        color: #536e7f;
+      .proposal {
+        max-width: 1272px;
+        margin: 0 auto 16px;
+        padding: 12px 18px;
+        background: #fff7e4;
+        border-left: 3px solid #c08b29;
+        font-size: 14px;
       }
       .message {
-        margin: 15px 4vw 0;
-        min-height: 24px;
-        font:
-          14px "Avenir Next",
-          sans-serif;
+        max-width: 1272px;
+        margin: 0 auto;
+        white-space: pre-wrap;
+        font-size: 14px;
+        color: var(--accent);
       }
-      .error {
-        color: #8c3029;
+      .message.error {
+        color: #8b302c;
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(290px, 0.78fr) minmax(0, 1.4fr);
+        gap: 26px;
+        max-width: 1320px;
+        padding: 0 24px 30px;
+        margin: auto;
+        align-items: start;
+      }
+      .source {
+        background: #fff;
+        border: 1px solid var(--line);
+        padding: 24px;
+        position: sticky;
+        top: 16px;
+      }
+      .source h2 {
+        font-size: 14px;
+        color: var(--muted);
+        font-weight: 500;
+        margin: 0 0 9px;
+      }
+      .source blockquote {
+        margin: 0;
+        font-size: 21px;
+        line-height: 1.65;
+        font-weight: 600;
+      }
+      .memory {
+        border-left: 4px solid var(--accent);
+        padding: 17px 18px;
+        margin: 22px -1px;
+        background: #edf7f7;
+      }
+      .memory h2 {
+        color: var(--accent);
+      }
+      .memory blockquote {
+        font-size: 19px;
+        font-weight: 550;
+      }
+      .date {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .source h3 {
+        font-size: 15px;
+        font-weight: 600;
+        margin: 22px 0 10px;
+      }
+      .source p {
+        margin: 5px 0;
+      }
+      .record {
+        border-top: 1px solid var(--line);
+        padding: 12px 0;
+      }
+      .record .meta {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .record .quote {
+        font-size: 14px;
+        white-space: pre-wrap;
+      }
+      .technical {
+        font-size: 12px;
+        color: var(--muted);
+        overflow-wrap: anywhere;
+      }
+      .technical pre {
+        white-space: pre-wrap;
+        font:
+          11px/1.6 ui-monospace,
+          monospace;
+      }
+      .record details {
+        margin-top: 6px;
+      }
+      .source details summary {
+        cursor: pointer;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .actionlist {
+        padding-left: 20px;
+        font-size: 14px;
+      }
+      .journey {
+        min-width: 0;
+      }
+      .steps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 16px;
+      }
+      .steps button {
+        padding: 7px 10px;
+        font-size: 12px;
+        border-radius: 4px;
+        background: transparent;
+        color: var(--muted);
+      }
+      .steps button.active {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: white;
+      }
+      .steps button.done {
+        border-bottom: 3px solid var(--accent);
+      }
+      .panel {
+        background: #fff;
+        border: 1px solid var(--line);
+        padding: 28px 30px;
+        min-height: 420px;
+      }
+      .stepcount {
+        font-size: 13px;
+        color: var(--accent);
+        margin: 0;
+      }
+      .panel h2 {
+        font-size: 25px;
+        line-height: 1.45;
+        margin: 8px 0 10px;
+        font-weight: 650;
+      }
+      .hint {
+        font-size: 14px;
+        color: var(--muted);
+        margin: 0 0 22px;
+        max-width: 65ch;
+      }
+      .choices {
+        display: grid;
+        gap: 11px;
+      }
+      .choice {
+        display: grid;
+        grid-template-columns: 20px 1fr;
+        gap: 12px;
+        border: 1px solid var(--line);
+        padding: 14px 16px;
+        cursor: pointer;
+        border-radius: 6px;
+        align-items: start;
+      }
+      .choice:has(input:checked) {
+        background: #edf8f8;
+        border-color: var(--accent);
+        box-shadow: inset 3px 0 0 var(--accent);
+      }
+      .choice input {
+        margin-top: 7px;
+        accent-color: var(--accent);
+        width: 16px;
+        height: 16px;
+      }
+      .choice strong {
+        font-size: 16px;
+        font-weight: 600;
+        display: block;
+      }
+      .choice .explain {
+        font-size: 13px;
+        color: var(--muted);
+        display: block;
+        margin-top: 3px;
+      }
+      .choice .code {
+        font:
+          11px ui-monospace,
+          monospace;
+        color: var(--muted);
+        display: block;
+        margin-top: 5px;
+      }
+      .fieldlabel {
+        font-size: 14px;
+        display: block;
+        margin: 16px 0 6px;
+      }
+      .wideinput {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 10px 12px;
+        background: white;
+      }
+      .panel textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 24px;
+      }
+      .small {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .summary {
+        margin-top: 18px;
+        padding: 19px 23px;
+        background: #dfeeee;
+        border-left: 4px solid var(--accent);
+      }
+      .summary h3 {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 0 0 6px;
+        font-weight: 500;
+      }
+      .summary strong {
+        font-size: 20px;
+      }
+      .summary p {
+        font-size: 14px;
+        margin: 7px 0 0;
+      }
+      .summary ul {
+        padding-left: 20px;
+        font-size: 13px;
+      }
+      .summary a {
+        color: inherit;
+      }
+      .evidencecard {
+        padding: 15px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .evidencecard .quote {
+        white-space: pre-wrap;
+        font-size: 14px;
+      }
+      .evidencecard .meta {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .evidencecard select {
+        max-width: 100%;
+        width: 100%;
+        padding: 9px;
+        border: 1px solid var(--line);
+        background: white;
+        border-radius: 5px;
+        font-size: 13px;
+      }
+      .decisive {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        font-size: 13px;
+        margin-top: 11px;
+      }
+      .decisive input {
+        margin-top: 5px;
+        width: 17px;
+        height: 17px;
+        accent-color: var(--accent);
+      }
+      .step-summary {
+        list-style: none;
+        padding: 0;
+        margin: 16px 0;
+      }
+      .step-summary li {
+        border-top: 1px solid var(--line);
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        font-size: 14px;
+        padding: 11px 0;
+      }
+      .step-summary .text {
+        color: var(--muted);
+      }
+      .reviewfoot {
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+        margin-top: 20px;
+      }
+      .reviewfoot .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .reviewfoot input {
+        flex: 1;
+        min-width: 150px;
       }
       .boundary {
-        max-width: 1440px;
+        max-width: 1320px;
         margin: auto;
-        padding: 0 4vw 32px;
-        font:
-          13px "Avenir Next",
-          sans-serif;
-        color: #5a7181;
+        padding: 0 24px 25px;
+        font-size: 12px;
+        color: var(--muted);
       }
-      input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: #184d70;
+      .originalnotes {
+        margin: 18px 0;
       }
-      @media (max-width: 850px) {
-        .layout {
+      .originalnotes summary {
+        cursor: pointer;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .originalnotes textarea {
+        margin-top: 10px;
+      }
+      .statusline {
+        font-size: 13px;
+        color: var(--accent);
+        margin: 10px 0 0;
+      }
+      @media (max-width: 900px) {
+        .workspace {
           grid-template-columns: 1fr;
-          gap: 18px;
         }
-        .fields {
-          grid-template-columns: 1fr;
+        .source {
+          position: static;
         }
-        .bar .count {
-          flex-basis: 100%;
+        .panel {
+          padding: 22px;
         }
-        .form {
-          padding: 18px;
+        .source blockquote {
+          font-size: 19px;
+        }
+        .top {
+          padding: 16px 20px;
+        }
+        .casebar {
+          padding: 14px 20px;
+        }
+        .workspace {
+          padding: 0 20px 24px;
+        }
+        .proposal,
+        .message {
+          margin-left: 20px;
+          margin-right: 20px;
+        }
+        .steps button {
+          font-size: 11px;
+        }
+        .panel h2 {
+          font-size: 22px;
         }
       }
     </style>
   </head>
   <body>
-    <header>
-      <h1>Review memory applicability</h1>
-      <p>Read the source, classify the boundary, and record your review.</p>
+    <header class="top">
+      <div class="brand">
+        <h1 id="page-title"></h1>
+        <p id="subtitle" class="subtitle"></p>
+      </div>
+      <div class="tools">
+        <button id="language"></button><button id="codes"></button
+        ><button id="import"></button><button id="export"></button
+        ><input id="file" type="file" accept=".json,application/json" hidden />
+      </div>
     </header>
-    <div class="bar">
-      <span class="count" id="progress" aria-live="polite"></span
-      ><button id="prev">Previous</button><button id="next">Next</button
-      ><label
-        >Reviewer
-        <input
-          id="reviewer"
-          placeholder="Your name"
-          autocomplete="off" /></label
-      ><button id="import">Import draft</button
-      ><button id="export">Export draft</button
-      ><input id="file" type="file" accept=".json,application/json" hidden />
+    <div class="casebar">
+      <strong id="progress" aria-live="polite"></strong
+      ><span class="chip" id="review-status"></span><button id="prev"></button
+      ><button id="next"></button>
     </div>
-    <div id="message" class="message" role="status"></div>
-    <div
-      id="proposal-notice"
-      class="notice"
-      hidden
-      style="margin: 16px 4vw 0"
-    ></div>
-    <main class="layout">
-      <section>
-        <div id="case-id" class="case-id"></div>
-        <h2 id="case-title"></h2>
-        <h3>Current request</h3>
-        <p id="query" class="context"></p>
-        <h3>Context</h3>
-        <p id="context" class="context"></p>
-        <div class="notice" id="legacy"></div>
-        <h3>Supplied records</h3>
-        <div id="records"></div>
-        <h3>Available task actions</h3>
-        <div id="actions" class="context"></div>
-      </section>
-      <section class="form">
-        <h2>Your classification</h2>
-        <p class="help">
-          Classify the action affected by memory. An old source proves
-          provenance; it does not establish current scope or permission. Consult
-          the classification rubric alongside this page.
-        </p>
-        <div id="fields" class="fields"></div>
-        <h3>Evidence roles</h3>
-        <p class="help">
-          Choose a kind for evidence you use. Mark an ID decisive only when it
-          changes your classification. A memory source cannot be decisive.
-        </p>
-        <div id="evidence"></div>
-        <h3>Review notes</h3>
-        <textarea
-          id="notes"
-          aria-label="Review notes"
-          style="width: 100%"
-          placeholder="Explain ambiguity, scope, or acceptable alternative evidence sets."
-        ></textarea>
-        <div class="foot">
-          <button class="primary" id="review">Mark reviewed</button
-          ><span class="status" id="review-status"></span>
+    <div id="proposal-notice" class="proposal" hidden></div>
+    <p id="message" class="message" role="status"></p>
+    <main class="workspace">
+      <aside class="source" aria-label="案例与记忆">
+        <h2 id="task-label"></h2>
+        <blockquote id="query"></blockquote>
+        <p id="date" class="date"></p>
+        <div class="memory">
+          <h2 id="memory-label"></h2>
+          <blockquote id="candidate"></blockquote>
+          <p id="memory-date" class="date"></p>
         </div>
+        <h3 id="history-label"></h3>
+        <div id="history"></div>
+        <details>
+          <summary id="boundary-label"></summary>
+          <div id="boundaries"></div>
+        </details>
+        <h3 id="actions-label"></h3>
+        <ul id="actions" class="actionlist"></ul>
+        <details>
+          <summary id="metadata-label"></summary>
+          <div id="metadata" class="technical"></div>
+        </details>
+      </aside>
+      <section class="journey">
+        <nav id="steps" class="steps" aria-label="判断步骤"></nav>
+        <section id="panel" class="panel"></section>
+        <section class="summary" aria-live="polite">
+          <h3 id="decision-label"></h3>
+          <strong id="decision"></strong>
+          <p id="decision-explain"></p>
+          <p id="decision-state" class="small"></p>
+        </section>
       </section>
     </main>
-    <p class="boundary">
-      This page works offline and makes no network requests. Changes remain in
-      this tab until you export a draft. A reviewed mark records your judgment;
-      validation and acceptance are separate steps. This prototype is not
-      production validated.
-    </p>
+    <p id="boundary" class="boundary"></p>
     <script>
       "use strict";
       const DATA = __REVIEW_DATA__;
-      let bundle = DATA.bundle,
-        index = 0;
-      const $ = (id) => document.getElementById(id),
-        targetKeys = Object.keys(bundle.cases[0].targets);
-      const labels = {
-        permission: "Permission",
-        relationship: "Relationship",
-        evidence_status: "Evidence status",
-        risk: "Action risk",
-        memory_action: "Expected memory action",
-        robust_action_available: "Robust action available",
-        robust_action: "Named robust action",
-      };
-      function tell(text, error = false) {
-        $("message").textContent = text;
-        $("message").className = "message" + (error ? " error" : "");
-      }
-      function dirty() {
-        const c = bundle.cases[index];
-        c.review = { status: "DRAFT", reviewer: null, reviewed_at: null };
-        update();
-      }
-      function update() {
-        const c = bundle.cases[index],
-          n = bundle.cases.filter((x) => x.review.status === "REVIEWED").length;
-        $("progress").textContent =
-          `Case ${index + 1} of ${bundle.cases.length} · ${n} marked reviewed`;
-        $("review-status").textContent =
-          c.review.status === "REVIEWED"
-            ? `Reviewed by ${c.review.reviewer}`
-            : "Draft · review pending";
-        $("prev").disabled = index === 0;
-        $("next").disabled = index === bundle.cases.length - 1;
-      }
-      function select(options, value, placeholder, onChange) {
-        const s = document.createElement("select");
-        s.append(new Option(placeholder, ""));
-        for (const v of options) s.append(new Option(v, v));
-        s.value = value === null ? "" : String(value);
-        s.onchange = () => onChange(s.value);
-        return s;
-      }
-      function render() {
-        const r = DATA.rows[index],
-          c = bundle.cases[index];
-        $("case-id").textContent = r.eval_id;
-        $("case-title").textContent = `Case ${index + 1}`;
-        $("query").textContent = r.current_query;
-        $("context").textContent = r.query_context;
-        $("legacy").textContent =
-          `Historical task-risk label: ${r.task_risk}. Classify action risk independently under the current rubric; this value is not prefilled.`;
-        $("actions").textContent = r.available_actions
-          .map((a) => a.description)
-          .join("\n");
-        $("records").replaceChildren();
-        for (const item of DATA.evidence[index]) {
-          const d = document.createElement("details");
-          d.className = "record";
-          const s = document.createElement("summary");
-          s.textContent = item.id + " · " + item.collection;
-          const pre = document.createElement("pre");
-          pre.textContent = JSON.stringify(item.record, null, 2);
-          d.append(s, pre);
-          $("records").append(d);
-        }
-        $("fields").replaceChildren();
-        for (const key of [
-          "permission",
-          "risk",
-          "evidence_status",
-          "relationship",
-          "memory_action",
-          "robust_action_available",
-          "robust_action",
-        ]) {
-          const div = document.createElement("div");
-          div.className = "field" + (key === "robust_action" ? " wide" : "");
-          const label = document.createElement("label");
-          label.textContent = labels[key];
-          label.htmlFor = "field-" + key;
-          let input;
-          if (key === "robust_action") {
-            input = document.createElement("textarea");
-            input.value = c.targets[key] || "";
-            input.oninput = () => {
-              c.targets[key] = input.value.trim() || null;
-              dirty();
-            };
-          } else {
-            const choices =
-              key === "robust_action_available"
-                ? ["true", "false"]
-                : DATA.enums[key];
-            input = select(choices, c.targets[key], "Choose…", (v) => {
-              c.targets[key] =
-                v === ""
-                  ? null
-                  : key === "robust_action_available"
-                    ? v === "true"
-                    : v;
-              if (key === "robust_action_available" && v === "false")
-                c.targets.robust_action = null;
-              dirty();
-              if (key === "robust_action_available") render();
-            });
-          }
-          input.id = "field-" + key;
-          if (key === "robust_action")
-            input.disabled = c.targets.robust_action_available !== true;
-          div.append(label, input);
-          $("fields").append(div);
-        }
-        $("evidence").replaceChildren();
-        for (const item of DATA.evidence[index]) {
-          const row = document.createElement("div");
-          row.className = "evidence-row";
-          const id = document.createElement("span");
-          id.className = "id";
-          id.textContent = item.id;
-          const kind = select(
-            DATA.enums.evidence_kind,
-            c.evidence_kinds[item.id] || null,
-            "Unused",
-            (v) => {
-              if (v) c.evidence_kinds[item.id] = v;
-              else delete c.evidence_kinds[item.id];
-              if (v === "MEMORY_SOURCE" || !v)
-                c.targets.decisive_evidence_ids = (
-                  c.targets.decisive_evidence_ids || []
-                ).filter((x) => x !== item.id);
-              dirty();
-              render();
-            },
-          );
-          kind.setAttribute("aria-label", "Evidence kind for " + item.id);
-          const label = document.createElement("label"),
-            check = document.createElement("input");
-          check.type = "checkbox";
-          check.checked = (c.targets.decisive_evidence_ids || []).includes(
-            item.id,
-          );
-          check.disabled =
-            !c.evidence_kinds[item.id] ||
-            c.evidence_kinds[item.id] === "MEMORY_SOURCE";
-          check.onchange = () => {
-            const ids = new Set(c.targets.decisive_evidence_ids || []);
-            check.checked ? ids.add(item.id) : ids.delete(item.id);
-            c.targets.decisive_evidence_ids = [...ids];
-            dirty();
-          };
-          label.append(check, document.createTextNode(" Decisive"));
-          row.append(id, kind, label);
-          $("evidence").append(row);
-        }
-        $("notes").value = c.notes;
-        $("notes").oninput = () => {
-          c.notes = $("notes").value;
-          dirty();
-        };
-        update();
-      }
-      function incomplete(c) {
-        for (const key of [
-          "permission",
-          "relationship",
-          "evidence_status",
-          "risk",
-          "memory_action",
-          "robust_action_available",
-        ])
-          if (c.targets[key] === null)
-            return `Choose ${labels[key].toLowerCase()} first.`;
-        if (c.targets.robust_action_available && !c.targets.robust_action)
-          return "Name the robust action first.";
-        if (!Object.keys(c.evidence_kinds).length)
-          return "Classify at least one supplied evidence record.";
-        const decisive = c.targets.decisive_evidence_ids || [],
-          kinds = new Set(decisive.map((id) => c.evidence_kinds[id]));
-        const rules = {
-          REVOKED: ["PERMISSION", "USER_STATEMENT"],
-          DIRECT: ["APPLICABILITY", "USER_STATEMENT"],
-          EXPLICIT_TRANSFER: ["APPLICABILITY", "USER_STATEMENT"],
-          SUPERSEDED: ["APPLICABILITY", "USER_STATEMENT", "CURRENT_EXTERNAL"],
-        };
-        for (const value of [c.targets.permission, c.targets.relationship])
-          if (rules[value] && !rules[value].some((k) => kinds.has(k)))
-            return `${value} needs decisive ${rules[value].join(" or ")} support.`;
-        if (
-          c.targets.evidence_status === "EXTERNAL_REQUIRED" &&
-          kinds.has("CURRENT_EXTERNAL")
-        )
-          return "Pending external verification cannot include decisive verified external evidence.";
-        return "";
-      }
-      $("review").onclick = () => {
-        const c = bundle.cases[index],
-          problem = incomplete(c),
-          name = $("reviewer").value.trim();
-        if (problem) return tell(problem, true);
-        if (!name) return tell("Enter your reviewer name first.", true);
-        c.targets.decisive_evidence_ids = c.targets.decisive_evidence_ids || [];
-        c.review = {
-          status: "REVIEWED",
-          reviewer: name,
-          reviewed_at: new Date().toISOString(),
-        };
-        tell("Review recorded. Export your draft to preserve it.");
-        update();
-      };
-      $("prev").onclick = () => {
-        index--;
-        tell("");
-        render();
-      };
-      $("next").onclick = () => {
-        index++;
-        tell("");
-        render();
-      };
-      $("export").onclick = () => {
-        const blob = new Blob([JSON.stringify(bundle, null, 2) + "\n"], {
-            type: "application/json",
-          }),
-          url = URL.createObjectURL(blob),
-          a = document.createElement("a");
-        a.href = url;
-        a.download =
-          "p2-targets-" +
-          new Date().toISOString().replace(/[:.]/g, "-") +
-          ".json";
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-        tell("Draft exported. Run the offline validator before acceptance.");
-      };
-      $("import").onclick = () => $("file").click();
-      $("file").onchange = async () => {
-        try {
-          const file = $("file").files[0];
-          if (!file) return;
-          const incoming = JSON.parse(await file.text());
-          if (
-            incoming.source_sha256 !== DATA.source_sha256 ||
-            incoming.protocol_version !== bundle.protocol_version ||
-            !Array.isArray(incoming.cases) ||
-            incoming.cases.length !== bundle.cases.length
-          )
-            throw Error(
-              "Protocol, source fingerprint, or case count does not match.",
-            );
-          const byId = new Map(incoming.cases.map((c) => [c.eval_id, c]));
-          if (byId.size !== bundle.cases.length)
-            throw Error("Duplicate case IDs.");
-          const ordered = DATA.rows.map((r, i) => {
-            const c = byId.get(r.eval_id);
-            if (
-              !c ||
-              !c.targets ||
-              Object.keys(c.targets).sort().join() !==
-                [...targetKeys].sort().join() ||
-              !c.review ||
-              !["DRAFT", "REVIEWED"].includes(c.review.status) ||
-              typeof c.notes !== "string" ||
-              !c.evidence_kinds
-            )
-              throw Error("Invalid draft structure.");
-            for (const k of [
-              "permission",
-              "relationship",
-              "risk",
-              "evidence_status",
-              "memory_action",
-            ])
-              if (
-                c.targets[k] !== null &&
-                !DATA.enums[k].includes(c.targets[k])
-              )
-                throw Error("Unknown target value.");
-            if (
-              ![null, true, false].includes(
-                c.targets.robust_action_available,
-              ) ||
-              !(
-                c.targets.robust_action === null ||
-                typeof c.targets.robust_action === "string"
-              )
-            )
-              throw Error("Invalid robust action.");
-            const known = new Set(DATA.evidence[i].map((x) => x.id));
-            for (const [id, kind] of Object.entries(c.evidence_kinds))
-              if (!known.has(id) || !DATA.enums.evidence_kind.includes(kind))
-                throw Error("Unknown evidence record or kind.");
-            if (
-              c.targets.decisive_evidence_ids !== null &&
-              (!Array.isArray(c.targets.decisive_evidence_ids) ||
-                new Set(c.targets.decisive_evidence_ids).size !==
-                  c.targets.decisive_evidence_ids.length ||
-                c.targets.decisive_evidence_ids.some(
-                  (id) =>
-                    !known.has(id) ||
-                    !c.evidence_kinds[id] ||
-                    c.evidence_kinds[id] === "MEMORY_SOURCE",
-                ))
-            )
-              throw Error("Invalid decisive evidence.");
-            if (
-              c.review.status === "REVIEWED" &&
-              (typeof c.review.reviewer !== "string" ||
-                !c.review.reviewer.trim() ||
-                typeof c.review.reviewed_at !== "string" ||
-                !/(Z|[+-]\d{2}:\d{2})$/.test(c.review.reviewed_at) ||
-                Number.isNaN(Date.parse(c.review.reviewed_at)) ||
-                incomplete(c))
-            )
-              throw Error("Incomplete reviewed record.");
-            return c;
-          });
-          bundle = {
-            protocol_version: incoming.protocol_version,
-            source_sha256: incoming.source_sha256,
-            cases: ordered,
-          };
-          tell("Draft imported.");
-          render();
-        } catch (e) {
-          tell("Import failed: " + e.message, true);
-        } finally {
-          $("file").value = "";
-        }
-      };
-      render();
-      const proposedCount = bundle.cases.filter((c) =>
-        c.notes.startsWith("ASSISTANT PROPOSAL, NOT GOLD."),
-      ).length;
-      if (proposedCount) {
-        $("proposal-notice").hidden = false;
-        $("proposal-notice").textContent =
-          `${proposedCount} assistant proposals are provided for review. They are drafts, not accepted targets. Review the first ${proposedCount} cases; the remaining cases can wait. Experimental answers are not shown.`;
-      }
+      __REVIEW_LOGIC__;
     </script>
   </body>
 </html>
