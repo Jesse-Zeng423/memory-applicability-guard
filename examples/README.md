@@ -12,7 +12,7 @@ python3 -B examples/run_examples.py
 | `explicit-transfer` | `REVISE / USE` | Explicit user transfer supports reuse in a new context. |
 | `robust-alternative` | `REVISE / IGNORE` | A useful reversible draft avoids relying on disputed memory. |
 
-Each `.input.json` has a paired `.expected.json`. The runner executes the helper and compares the complete parsed output, including evidence and boundary text. These snapshots document the API; independent rule and precedence assertions live in `tests/`.
+Each case is a three-part demonstration: `.scenario.md` describes the natural-language situation, `.input.json` provides the expected classification, and `.expected.json` records the helper result. The runner executes the helper and compares the complete parsed output, including evidence and boundary text. These snapshots document the API; independent rule and precedence assertions live in `tests/`.
 
 Run one example directly:
 

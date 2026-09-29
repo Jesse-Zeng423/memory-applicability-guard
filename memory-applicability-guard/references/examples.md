@@ -33,3 +33,19 @@ One supplied action is acceptable across the reasonable applicability worlds. Se
 ## 8. High-risk unresolved case
 
 Set `risk=HIGH`. Result: `ESCALATE`, `UNCERTAIN / IGNORE`. The prototype cannot autonomously approve high-risk memory-grounded actions.
+
+## 9. Unsupported classification is rejected
+
+A caller marks `relationship=EXPLICIT_TRANSFER`, but supplies only a
+non-decisive `MEMORY_SOURCE` record. The helper raises
+`SEMANTIC_CONSISTENCY_ERROR`; no verdict or memory action is returned.
+Supply actual decisive transfer evidence or correct the classification from
+the available context. An evidence kind label alone does not prove transfer.
+
+## 10. Medium risk needs confirmation
+
+A caller supplies decisive `APPLICABILITY` evidence for `DIRECT` scope,
+allowed permission, and sufficient evidence, but no decisive `PERMISSION`
+or `USER_STATEMENT`. At `risk=MEDIUM`, the result is `ASK_USER / ASK` with
+reason `MEDIUM_RISK_CONFIRMATION_REQUIRED`. Supplied decisive permission
+or user confirmation clears this additional rule; the other rules still apply.

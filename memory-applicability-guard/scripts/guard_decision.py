@@ -8,6 +8,8 @@ import sys
 from typing import Any
 
 
+__version__ = "1.1.0"
+
 PERMISSIONS = {"ALLOWED", "REVOKED", "UNKNOWN"}
 RELATIONSHIPS = {"DIRECT", "EXPLICIT_TRANSFER", "NO_BRIDGE", "SUPERSEDED", "CONFLICTING", "UNKNOWN"}
 EVIDENCE_STATUSES = {"SUFFICIENT", "USER_RESOLVABLE", "EXTERNAL_REQUIRED", "UNKNOWN"}
@@ -26,11 +28,28 @@ REQUIRED_FIELDS = {
     "evidence",
 }
 OPTIONAL_FIELDS = {"robust_action"}
+# Presence/type checks only: these do not verify the evidence text or its age.
+CLAIM_SUPPORT = {
+    "permission": {"REVOKED": {"PERMISSION", "USER_STATEMENT"}},
+    "relationship": {
+        "DIRECT": {"APPLICABILITY", "USER_STATEMENT"},
+        "EXPLICIT_TRANSFER": {"APPLICABILITY", "USER_STATEMENT"},
+        "SUPERSEDED": {"APPLICABILITY", "USER_STATEMENT", "CURRENT_EXTERNAL"},
+    },
+}
 BOUNDARY = "Research-informed decision-support prototype; not production validated; no autonomous execution or high-risk approval."
 
 
 class InputValidationError(ValueError):
     """Raised when a guard input violates the closed input contract."""
+
+    code = "INPUT_VALIDATION_ERROR"
+
+
+class SemanticConsistencyError(InputValidationError):
+    """Raised when classifications lack the required decisive evidence kinds."""
+
+    code = "SEMANTIC_CONSISTENCY_ERROR"
 
 
 def _nonempty_string(value: Any) -> bool:
@@ -105,6 +124,28 @@ def validate_input(payload: Any) -> dict[str, Any]:
     return payload
 
 
+def validate_consistency(payload: dict[str, Any]) -> dict[str, Any]:
+    """Check a structurally valid payload and report all support violations."""
+    decisive_kinds = {item["kind"] for item in payload["evidence"] if item["decisive"]}
+    errors: list[str] = []
+    for field, claims in CLAIM_SUPPORT.items():
+        value = payload[field]
+        required_kinds = claims.get(value)
+        if required_kinds is not None and not decisive_kinds.intersection(required_kinds):
+            errors.append(
+                f"{field}={value} requires decisive evidence of kind "
+                + " or ".join(sorted(required_kinds))
+            )
+    if payload["evidence_status"] == "EXTERNAL_REQUIRED" and "CURRENT_EXTERNAL" in decisive_kinds:
+        errors.append(
+            "evidence_status=EXTERNAL_REQUIRED cannot include decisive CURRENT_EXTERNAL; "
+            "reclassify the already-verified fact or narrow the unresolved claim"
+        )
+    if errors:
+        raise SemanticConsistencyError("; ".join(errors))
+    return payload
+
+
 def _decisive_evidence(payload: dict[str, Any]) -> list[dict[str, str]]:
     return [
         {"id": item["id"], "kind": item["kind"], "text": item["text"]}
@@ -119,16 +160,20 @@ def _aligned_verdict(proposed: str, recommended: str) -> str:
 
 def decide(value: Any) -> dict[str, Any]:
     payload = validate_input(value)
+    validate_consistency(payload)
     proposed = payload["proposed_memory_action"]
     permission = payload["permission"]
     relationship = payload["relationship"]
     evidence_status = payload["evidence_status"]
     robust = payload["robust_action_available"]
     risk = payload["risk"]
+    decisive_kinds = {item["kind"] for item in payload["evidence"] if item["decisive"]}
 
     if permission == "REVOKED":
         verdict, action, state, source, reason = _aligned_verdict(proposed, "IGNORE"), "IGNORE", "CLEAR_INAPPLICABLE", "USER", "PERMISSION_REVOKED"
         next_step = "Do not rely on the candidate memory; continue only with permission-safe information."
+        if risk == "HIGH":
+            next_step += " The underlying high-risk task still requires qualified human review."
     elif risk == "HIGH":
         verdict, action, state, source, reason = "ESCALATE", "IGNORE", "UNCERTAIN", "HUMAN_REVIEW", "HIGH_RISK_HUMAN_REVIEW_REQUIRED"
         next_step = "Pause memory-grounded action and escalate to a qualified human decision-maker."
@@ -141,10 +186,16 @@ def decide(value: Any) -> dict[str, Any]:
     elif relationship == "SUPERSEDED":
         verdict, action, state, source, reason = _aligned_verdict(proposed, "IGNORE"), "IGNORE", "CLEAR_INAPPLICABLE", "SUPPLIED_EVIDENCE", "SUPERSEDED"
         next_step = "Use the newer supplied evidence and do not rely on the superseded memory."
+    elif risk == "MEDIUM" and not decisive_kinds.intersection({"PERMISSION", "USER_STATEMENT"}):
+        verdict, action, state, source, reason = "ASK_USER", "ASK", "UNCERTAIN", "USER", "MEDIUM_RISK_CONFIRMATION_REQUIRED"
+        next_step = "Obtain explicit user or permission confirmation before relying on memory for this medium-risk action."
     elif relationship in {"DIRECT", "EXPLICIT_TRANSFER"} and permission == "ALLOWED" and evidence_status == "SUFFICIENT":
         verdict, action, state, source = _aligned_verdict(proposed, "USE"), "USE", "CLEAR_APPLICABLE", "SUPPLIED_EVIDENCE"
         reason = relationship
         next_step = "The recommendation may rely on the candidate memory within the evidenced scope and permission."
+    elif relationship == "CONFLICTING" and not robust:
+        verdict, action, state, source, reason = "ASK_USER", "ASK", "UNCERTAIN", "USER", "CONFLICTING_EVIDENCE"
+        next_step = "Ask one targeted question to resolve the competing current evidence before relying on memory."
     elif evidence_status == "USER_RESOLVABLE" and not robust:
         verdict, action, state, source, reason = "ASK_USER", "ASK", "UNCERTAIN", "USER", "USER_RESOLVABLE_UNCERTAINTY"
         next_step = "Ask one targeted question whose answer would change the memory or task action."
@@ -172,7 +223,7 @@ def main() -> int:
         payload = json.load(sys.stdin)
         result = decide(payload)
     except (json.JSONDecodeError, InputValidationError) as error:
-        message = {"details": str(error), "error": "INPUT_VALIDATION_ERROR"}
+        message = {"details": str(error), "error": getattr(error, "code", "INPUT_VALIDATION_ERROR")}
         print(json.dumps(message, ensure_ascii=False, sort_keys=True, separators=(",", ":")), file=sys.stderr)
         return 2
     print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":")))

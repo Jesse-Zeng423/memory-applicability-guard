@@ -38,11 +38,30 @@ Example request:
 
 > Use $memory-applicability-guard to audit the supplied candidate memory and proposed memory action. Use only the evidence in this request. Return the structured decision and its limitations.
 
-Provide the fields documented in [the decision model](memory-applicability-guard/references/decision-model.md). To run the helper directly:
+Classify supplied evidence using [the classification rubric](memory-applicability-guard/references/classification-rubric.md). Provide the fields documented in [the decision model](memory-applicability-guard/references/decision-model.md). To run the helper directly:
 
 ```bash
 python3 -B memory-applicability-guard/scripts/guard_decision.py < examples/superseded-preference.input.json
 ```
+
+## Validation and compatibility
+
+The helper validates input structure, then classification/evidence-kind
+consistency. Unsupported `DIRECT`, `EXPLICIT_TRANSFER`, `SUPERSEDED`, or
+`REVOKED` classifications are rejected; pending external verification cannot
+coexist with decisive already-verified external evidence for the same claim.
+
+Errors are JSON on stderr, with exit code 2 and no decision on stdout:
+`INPUT_VALIDATION_ERROR` for invalid structure, or
+`SEMANTIC_CONSISTENCY_ERROR` for inconsistent evidence-kind support.
+Correct classifications using supplied evidence; never invent support to pass.
+These checks do not verify evidence truth, recency, or actual entailment.
+
+Medium-risk reliance requires decisive user or permission confirmation, and
+conflicting evidence receives a distinct reason code. The stricter rejection
+behavior changes the input acceptance contract; version 1.1.0 is adopted
+for this update; the owner has approved that version. Publication through the hardening PR does not imply a merged release. The existing verdict format remains intact:
+ASK_USER still describes the next step even when proposed reliance is ASK.
 
 ## How it works
 

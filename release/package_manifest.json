@@ -3,6 +3,7 @@
   "historical_release": "release/public_release_manifest_v1.0.0.json",
   "license": "MIT",
   "package_name": "memory-applicability-guard",
+  "package_version": "1.1.0",
   "packaging_date": "2026-09-29",
   "python_requires": ">=3.10",
   "research_disposition": "STOP_AT_V07",
@@ -10,19 +11,23 @@
   "skill_files": [
     {
       "path": "SKILL.md",
-      "sha256": "e934366dde3538d35f6836846a08f76169a60ad31789ff571af66498101d4ad8"
+      "sha256": "164588b09ab28599c16a0ad1ce6ff951462f3b98e7482e474411a6993bd03b64"
     },
     {
       "path": "agents/openai.yaml",
       "sha256": "1ce7346f3be5c42ccd173d0a92bebf991ff563bd63da74ff1a1b0f18ee0147c7"
     },
     {
+      "path": "references/classification-rubric.md",
+      "sha256": "3f05cd5b7e1688446324100a102126cf419b8ed21498345bbabe51bc5d8486cf"
+    },
+    {
       "path": "references/decision-model.md",
-      "sha256": "004d173e3042f2cbfaef863b525e390c6c260f3bbed9afe8e48d858afe8d94a3"
+      "sha256": "609bd2e2491df1a6262372fe4bbd16fe586cd1ce21bf60d2b24031bb94beef0b"
     },
     {
       "path": "references/examples.md",
-      "sha256": "3737e20933b15aea35695bb80116f8b88a3529721720d58e7086df77a138406f"
+      "sha256": "4897aba8293e0016d27666474bee4918120afbff52330193fb51044cfcdf9d4e"
     },
     {
       "path": "references/research-boundaries.md",
@@ -30,7 +35,7 @@
     },
     {
       "path": "scripts/guard_decision.py",
-      "sha256": "3a4ed4c045d8ade4efd72edd016e1b6cc73b14703c27c8099962f1dbd2629a1d"
+      "sha256": "5873ccb197a6fb19b25a82de98471ad2cc64347b6fcb6a39bb7b8eefd3d772cd"
     }
   ],
   "skill_root": "memory-applicability-guard"

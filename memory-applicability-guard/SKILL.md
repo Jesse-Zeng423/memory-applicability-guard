@@ -1,86 +1,75 @@
 ---
 name: memory-applicability-guard
-description: Audit whether a candidate memory should inform an agent's recommendation or action, and return PASS, REVISE, ASK_USER, VERIFY_EXTERNAL, or ESCALATE with a structured USE/IGNORE/ASK decision. Use for memory-grounded recommendation, personalization audit, USE/IGNORE/ASK review, superseded memory, cross-domain transfer, permission revocation, evidence gaps, and robust-action analysis. This is a research-informed decision-support prototype, not a production-validated autonomous guard.
+description: Review whether supplied candidate memory may inform a current action. Use for scope, permission, conflicting evidence, and explicit transfer audits before memory reliance.
 ---
 
 # Memory Applicability Guard
 
-## Installation
+## When to use
 
-Copy this entire `memory-applicability-guard/` directory into your agent's
-supported skill directory. For a local Codex installation, the existing
-`~/.codex/skills/` directory is one option. Keep this file, `scripts/`,
-`references/`, and `agents/` together. Review an existing installation before
-replacing it. Python 3.10 or later is required only for the helper.
+Use after retrieval and before response generation when candidate memories,
+current task context, and evidence metadata are exposed. Audit one memory
+and its proposed `USE`, `IGNORE`, or `ASK` action per call.
 
-Invoke with `$memory-applicability-guard` when the host supports named skills,
-or explicitly ask the agent to follow this file. Supply the current task,
-candidate memory, proposed reliance, permission, scope, risk, and evidence.
-The repository README contains clone and installation commands.
+## When not to use
 
-## Goal
+Do not use for retrieval, memory storage, factual verification, generic advice,
+or a task with no identifiable candidate memory. Do not invent hidden memories
+or promise coverage when required context and metadata are unavailable.
 
-Review a supplied candidate memory before an agent relies on it. Treat the result as decision support only; never execute or silently rewrite the agent's answer.
+## Workflow
 
-## Extract input
+### 1. Establish the audit
 
-1. Identify `current_task` and `candidate_memory` from supplied context.
-2. Record the agent's `proposed_memory_action` as `USE`, `IGNORE`, or `ASK`.
-3. Classify explicit `permission`, `relationship`, `evidence_status`, `risk`, and robust-action availability.
-4. Preserve evidence IDs and mark only current boundary evidence as decisive. Never treat memory provenance as applicability evidence.
-5. If these structured fields cannot be supported by supplied evidence, label them `UNKNOWN`; do not infer transfer from relevance or similarity.
+Identify the supplied `current_task`, `candidate_memory`, and
+`proposed_memory_action`. Keep the underlying task separate from memory reliance.
+Done when the memory and proposed action are explicit; otherwise request only
+what is needed to identify them.
 
-Read `references/decision-model.md` whenever classifying inputs or explaining precedence. Read `references/examples.md` for synthetic examples or calibration. Read `references/research-boundaries.md` before high-risk use, product claims, deployment discussion, or reporting frozen metrics.
+### 2. Classify from evidence
 
-## Decide
+Read [classification-rubric.md](references/classification-rubric.md) before
+classification. Build the closed input in [decision-model.md](references/decision-model.md).
+Follow evidence → permission → risk → evidence status → relationship → robust action.
+Preserve supplied IDs and text. Mark decisive evidence only when removing it
+would change the classification. Keep unsupported classifications `UNKNOWN`;
+for unresolved risk, use the higher plausible tier as the rubric specifies.
+Done when each classification has an explicit basis and a robust action, if
+present, is named and supported. Use [examples.md](references/examples.md) to
+resolve the documented distinctions.
 
-Apply this order:
+### 3. Validate and decide
 
-1. Revoked permission: ignore the memory.
-2. High risk: escalate to human review.
-3. Required current or third-party evidence: verify externally; never ask the user to guess live facts.
-4. `NO_BRIDGE` or `SUPERSEDED`: ignore the memory.
-5. Allowed, sufficiently evidenced `DIRECT` or `EXPLICIT_TRANSFER`: use the memory.
-6. User-resolvable, action-changing uncertainty without a robust action: ask the user.
-7. Robust action across reasonable worlds: ignore the disputed memory and take the named robust action without asking.
-8. Other evidence gaps: ask for clarification; never default to USE.
-
-## Run deterministic helper
-
-Pass one JSON object on stdin:
+Resolve `<skill-dir>` to this skill's actual directory; do not depend on the
+current working directory. With Python 3.10 or later, pass one object on stdin:
 
 ```bash
-python3 scripts/guard_decision.py < guard-input.json
+python3 -B "<skill-dir>/scripts/guard_decision.py" < guard-input.json
 ```
 
-Use the helper only after extracting explicit structured inputs. Treat its JSON as a recommendation, not an automatic edit. If validation fails, correct the input; never weaken validation.
+`INPUT_VALIDATION_ERROR` means the closed input structure is invalid.
+`SEMANTIC_CONSISTENCY_ERROR` means a classification lacks a required decisive
+evidence kind or contradicts the external-verification classification.
+Both exit with code 2 and write JSON to stderr; neither produces a decision.
+Correct inputs using supplied evidence, or report the gap. Never invent evidence
+or weaken validation to obtain a result. The check verifies evidence kinds,
+not whether the text is true, current, or actually supports the classification.
+If Python is unavailable, manually apply both validation stages and the ordered
+rules in the decision model; label the result as manual and unverified by the helper.
+Done when validation succeeds and a decision is produced, or an error is reported.
 
-## Respond
+### 4. Report for review
 
-Return exactly these fields from the helper:
+Return `guard_verdict`, `memory_action`, `memory_state`, `resolution_source`,
+`decisive_evidence`, `reason_code`, `next_step`, and `boundary` without changing
+the helper's result. Report validation failures separately. `PASS` concerns only
+memory reliance; a high-risk underlying task still needs human review.
+Done when the result and its evidence can be inspected without executing an action.
 
-- `guard_verdict`
-- `memory_action`
-- `memory_state`
-- `resolution_source`
-- `decisive_evidence`
-- `reason_code`
-- `next_step`
-- `boundary`
+## Boundaries
 
-Keep `memory_action` separate from the underlying task action. Make the research/product boundary visible in every result.
-
-## Hard rules
-
-- Relevance is not applicability; similarity is not explicit transfer.
-- Memory provenance is not applicability evidence.
-- Truth is not permission; citation is not correct evidence use.
-- Conservative behavior is not always ASK; prefer a supplied robust action.
-- Do not browse, call APIs, read credentials, access private gold, or retrieve hidden memories through this Skill.
-- Do not modify the agent's original output or execute the proposed action.
-- Do not approve medical, legal, financial, employment, insurance, housing, privacy, or safety-critical actions. Escalate high risk.
-- Never claim accuracy improvement, production validation, autonomous safety, or deployment readiness.
-
-## Research boundary
-
-Describe the capability as: **Research-informed Memory Applicability Guard — Decision support only; not production validated.** Preserve `STOP_AT_V07`; the Skill operationalizes an auditable review workflow but does not overturn the frozen negative result.
+Use only supplied information. Do not retrieve memories, browse, call APIs,
+read credentials or private gold, modify the original response, or execute tasks.
+Read [research-boundaries.md](references/research-boundaries.md) before reporting
+metrics, discussing deployment, or making capability claims. This is decision
+support only, not production validated. High-risk actions require human review.
