@@ -44,8 +44,9 @@ relationship from prose.
 
 This makes rule execution reproducible, but creates a clear limitation:
 incorrect classifications can produce an inappropriate recommendation.
-Validation cannot prove that the supplied evidence supports the agent's
-interpretation. The skill therefore asks callers to keep unknowns explicit.
+A consistency check requires certain decisive evidence kinds for specific
+classifications and rejects incompatible verification status. It still cannot
+prove that evidence text supports the agent's interpretation. The skill therefore asks callers to keep unknowns explicit.
 
 ### Separate memory reliance from the task itself
 
@@ -88,8 +89,9 @@ and package-level tests live outside it so the skill stays portable.
 
 The rules consider revoked permission first, then high risk, then required
 external verification. They next handle a missing transfer bridge and
-superseded memory, followed by supported direct or explicit transfer,
-user-resolvable uncertainty, robust alternatives, and remaining gaps.
+superseded memory, followed by medium-risk confirmation, supported direct
+or explicit transfer, conflicting evidence, user-resolvable uncertainty,
+robust alternatives, and remaining gaps.
 Revoked permission therefore always prevents reliance on that memory,
 even when other conditions also apply. It does not clear a high-risk task
 for autonomous execution.

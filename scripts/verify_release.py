@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline package integrity and behavior checks; not a safety certification."""
 from __future__ import annotations
+import ast
 import hashlib
 import io
 import json
@@ -17,7 +18,8 @@ def digest(path):
 
 def package_files():
     return sorted(str(p.relative_to(ROOT)) for p in ROOT.rglob("*")
-                  if p.is_file() and not (set(p.relative_to(ROOT).parts) & IGNORED_PARTS)
+                  if p.is_file() and p.relative_to(ROOT).parts[0] != "local"
+                  and not (set(p.relative_to(ROOT).parts) & IGNORED_PARTS)
                   and p.name not in {".DS_Store", ".coverage"} and p.suffix != ".pyc")
 
 def verify():
@@ -69,6 +71,12 @@ def verify():
             if marker in text:
                 errors.append(f"Private-data marker in {relative}")
     helper = (SKILL / "scripts/guard_decision.py").read_text()
+    module = ast.parse(helper)
+    versions = [node.value.value for node in module.body
+                if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == "__version__" for target in node.targets)
+                and isinstance(node.value, ast.Constant)]
+    if len(versions) != 1 or versions[0] != manifest.get("package_version"):
+        errors.append("Helper and package versions do not match")
     compile(helper, str(SKILL / "scripts/guard_decision.py"), "exec")
     for marker in ("import os", "import socket", "import urllib", "import requests", "http.client", "subprocess", "OPENAI_API_KEY"):
         if marker in helper:

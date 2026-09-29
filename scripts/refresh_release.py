@@ -7,7 +7,7 @@ from verify_release import ROOT, digest, package_files
 def main():
     manifest = {
         "schema_version": "1.0", "package_name": "memory-applicability-guard",
-        "packaging_date": "2026-09-29", "license": "MIT",
+        "package_version": "1.1.0", "packaging_date": "2026-09-29", "license": "MIT",
         "skill_root": "memory-applicability-guard", "python_requires": ">=3.10",
         "research_disposition": "STOP_AT_V07",
         "boundary": "Research-informed decision support only; not production validated.",

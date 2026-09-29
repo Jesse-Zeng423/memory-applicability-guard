@@ -5,3 +5,6 @@ __pycache__/
 .venv/
 .DS_Store
 dist/
+
+# Local evaluation inputs, annotations, credentials launcher, and outputs.
+/local/
